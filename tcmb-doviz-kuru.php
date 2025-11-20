@@ -121,28 +121,37 @@ function tcmb_doviz_kuru_get_rates() {
 		return $cached;
 	}
 
-	$response = wp_remote_get(
-		'https://www.tcmb.gov.tr/kurlar/today.xml',
-		array(
-			'timeout' => 10,
-		)
-	);
+        $response = wp_safe_remote_get(
+                'https://www.tcmb.gov.tr/kurlar/today.xml',
+                array(
+                        'timeout'    => 10,
+                        'user-agent' => 'tcmb-doviz-kuru/' . TCMB_DOVIZ_KURU_VERSION,
+                )
+        );
 
-	if ( is_wp_error( $response ) ) {
-		return array();
-	}
+        if ( is_wp_error( $response ) ) {
+                return array();
+        }
 
-	$body = wp_remote_retrieve_body( $response );
+        $status_code = wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $status_code ) {
+                return array();
+        }
 
-	if ( empty( $body ) ) {
-		return array();
-	}
+        $body = wp_remote_retrieve_body( $response );
 
-	$xml = simplexml_load_string( $body );
+        if ( empty( $body ) ) {
+                return array();
+        }
 
-	if ( ! $xml ) {
-		return array();
-	}
+        $previous_internal_errors = libxml_use_internal_errors( true );
+        $xml                      = simplexml_load_string( $body, 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOWARNING );
+        libxml_clear_errors();
+        libxml_use_internal_errors( $previous_internal_errors );
+
+        if ( ! $xml ) {
+                return array();
+        }
 
 	$rates = array();
 
