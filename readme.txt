@@ -135,6 +135,14 @@ Hayır. Eklentiyi sadece **kısa kod için** kullanabilirsiniz. WooCommerce ente
 * **Tek para birimi (single)**: Tüm ürün fiyatlarını aynı para biriminde (örneğin USD) girersiniz. Eklenti tümünü seçtiğiniz mağaza para birimine (örneğin TRY) çevirir.
 * **Ürün başına (per_product)**: Her ürün için WooCommerce ürün düzenleme ekranında “Ürün Para Birimi (TCMB)” alanından ayrı para birimi seçebilirsiniz (USD/EUR/GBP/JPY/CNY/AED/TRY). Eklenti her ürünün kendi kurunu kullanır.
 
+= WooCommerce sepeti ve kasa aşamasında fiyatlar nasıl davranır? =
+
+Eklenti, WooCommerce sepeti ve kasa sayfalarında ürünlerin **o anki TCMB kuruna** göre dönüştürülmüş fiyatlarını gösterir. Sepetteki adet değişiklikleri veya kupon uygulamaları, dönüştürülmüş tutarlar üzerinde otomatik olarak güncellenir.
+
+= Mağaza para birimi ve dönüştürülen fiyatların formatlaması nasıl yapılır? =
+
+WooCommerce → Ayarlar → Genel → **Para Birimi** ayarını baz alır. Eklenti dönüştürülmüş fiyatları WooCommerce’in varsayılan sayı formatlamasıyla (ayırıcı, nokta/virgül, para birimi sembolü) gösterir; ek bir format tanımlamanıza gerek yoktur.
+
 = Mağaza para birimim ile eklentide seçtiğim çıktı para birimi aynı mı olmalı? =
 
 Önerilen, WooCommerce → Ayarlar → Genel → **Para Birimi** ile eklentideki **“Mağaza Para Birimi (Görüntülenen)”** ayarının aynı olmasıdır (örneğin ikisi de TRY). Böylece fiyat formatlama ve ödeme sayfası daha tutarlı olur.
@@ -149,6 +157,10 @@ Evet. WooCommerce’i hiç kullanmasanız bile kısa kodlarla kuru gösterebilir
 * `[tcmb_kur code="EUR" field="ForexBuying" decimals="4"]`
 * `[tcmb_kur_table codes="USD,EUR,GBP,JPY,CNY,AED" field="ForexSelling" decimals="4"]`
 
+= Kısa kod çıktılarında tarih, bayrak ve sembolü aynı anda gizleyebilir miyim? =
+
+Evet. `show_date="no" show_flag="no" show_symbol="no"` parametrelerini birlikte kullanabilirsiniz. Örneğin: `[tcmb_kur code="USD" show_date="no" show_flag="no" show_symbol="no"]` yalnızca sayısal kuru verir.
+
 = Elementor widget’i nasıl kullanılır? =
 
 1. Elementor ile sayfayı açın.
@@ -161,6 +173,18 @@ Evet. WooCommerce’i hiç kullanmasanız bile kısa kodlarla kuru gösterebilir
    * Bayrak/sembol/tarih gösterimi
    seçeneklerini ayarlayın.
 5. Style sekmesinden yazı tipi, boyut ve renkleri belirleyin.
+
+= Elementor widget’inde renk ve tipografi ayarları temaya müdahale eder mi? =
+
+Hayır. Widget’in Style sekmesindeki ayarlar sadece widget içeriğini etkiler. Tema genel tipografisi değişmeden, yalnızca döviz kuru çıktısının rengi, boyutu veya yazı tipi özelleştirilir.
+
+= Önbellek süresini düşürürsem TCMB’ye gereksiz istek gider mi? =
+
+Önbellek süresini 5 dakika gibi düşük bir değere çekerseniz, site trafiğiniz arttıkça TCMB’ye yapılan istek sayısı da artar. Trafiğe göre 30–120 dakika arası önerilir; manuel yenileme butonunu kullanarak gerektiğinde güncelleme yapabilirsiniz.
+
+= XML bağlantısı geçici olarak başarısız olursa fiyatlar ne olur? =
+
+Eklenti, **son başarılı kur verisini** saklar ve XML isteği geçici olarak başarısız olsa bile bu veriyi kullanmaya devam eder. Kurlar güncel değilse “Son TCMB Durumu” kutusunda son hata mesajını görebilirsiniz.
 
 ---
 
