@@ -113,7 +113,7 @@ function tcmb_doviz_kuru_get_wc_options() {
  * ]
  */
 function tcmb_doviz_kuru_get_rates() {
-	$general = tcmb_doviz_kuru_get_general_options();
+	$general   = tcmb_doviz_kuru_get_general_options();
 	$cache_key = 'tcmb_doviz_kuru_cache';
 	$cached    = get_transient( $cache_key );
 
@@ -617,8 +617,6 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
 		}
 	}
 
-	$symbols   = tcmb_doviz_kuru_get_symbols();
-	$symbol    = isset( $symbols[ $input_currency ] ) ? $symbols[ $input_currency ] : $input_currency;
 	$raw_price = $product->get_meta( '_price' );
 
 	if ( '' === $raw_price || null === $raw_price ) {
@@ -642,8 +640,309 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
 add_filter( 'woocommerce_get_price_html', 'tcmb_doviz_kuru_wc_show_original_price', 20, 2 );
 
 /* --------------------------------------------------------------------------
- * Admin Pages
+ * Admin Pages (modern UI)
  * ----------------------------------------------------------------------- */
+
+/**
+ * Admin CSS – sadece eklenti sayfasında.
+ */
+function tcmb_doviz_kuru_admin_assets( $hook_suffix ) {
+	if ( 'toplevel_page_tcmb-doviz-kuru' !== $hook_suffix ) {
+		return;
+	}
+
+	wp_register_style( 'tcmb-doviz-kuru-admin', false );
+	wp_enqueue_style( 'tcmb-doviz-kuru-admin' );
+
+	$css = '
+		.tcmb-doviz-kuru-admin {
+			max-width: 1100px;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			margin-bottom: 16px;
+			gap: 16px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-header-main h1 {
+			margin: 0 0 4px;
+			font-size: 26px;
+			font-weight: 700;
+			letter-spacing: 0.01em;
+			color: #0f172a;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-header-main p.tcmb-doviz-kuru-subtitle {
+			margin: 0;
+			color: #64748b;
+			font-size: 14px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-badge {
+			background: linear-gradient(135deg, #0f766e, #0ea5e9);
+			color: #ffffff;
+			padding: 6px 14px;
+			border-radius: 999px;
+			font-size: 12px;
+			font-weight: 600;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			white-space: nowrap;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-badge span.tcmb-pill-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 999px;
+			background-color: rgba(255,255,255,0.8);
+		}
+
+		.tcmb-doviz-kuru-admin .nav-tab-wrapper {
+			margin-top: 16px;
+			margin-bottom: 20px;
+			border-bottom: none;
+		}
+
+		.tcmb-doviz-kuru-admin .nav-tab-wrapper .nav-tab {
+			border-radius: 999px;
+			border: none;
+			background-color: #e2e8f0;
+			color: #475569;
+			font-weight: 500;
+			padding: 8px 16px;
+			margin-right: 8px;
+			margin-bottom: 6px;
+		}
+
+		.tcmb-doviz-kuru-admin .nav-tab-wrapper .nav-tab:hover {
+			background-color: #cbd5f5;
+			color: #0f172a;
+		}
+
+		.tcmb-doviz-kuru-admin .nav-tab-wrapper .nav-tab-active {
+			background: linear-gradient(135deg, #0f766e, #0ea5e9);
+			color: #ffffff;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-tab-content {
+			margin-top: 4px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card {
+			background-color: #ffffff;
+			border-radius: 14px;
+			border: 1px solid #e2e8f0;
+			box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+			padding: 22px 22px 18px;
+			margin-bottom: 24px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: radial-gradient(circle at top right, rgba(59,130,246,0.12), transparent 55%);
+			opacity: 0.9;
+			pointer-events: none;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card-inner {
+			position: relative;
+			z-index: 1;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			margin-bottom: 12px;
+			gap: 12px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card-title {
+			font-size: 18px;
+			font-weight: 600;
+			color: #0f172a;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card-title-pill {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			background-color: #e0f2fe;
+			color: #0369a1;
+			padding: 3px 8px;
+			border-radius: 999px;
+			font-weight: 600;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card-description {
+			margin-top: 4px;
+			margin-bottom: 0;
+			color: #64748b;
+			font-size: 13px;
+			max-width: 460px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-card-badge {
+			background-color: #ecfdf5;
+			color: #15803d;
+			border-radius: 999px;
+			padding: 4px 10px;
+			font-size: 11px;
+			font-weight: 600;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			white-space: nowrap;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-dot-green {
+			width: 7px;
+			height: 7px;
+			border-radius: 999px;
+			background-color: #22c55e;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-intro-grid {
+			display: grid;
+			grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+			gap: 18px;
+		}
+
+		@media (max-width: 960px) {
+			.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-intro-grid {
+				grid-template-columns: minmax(0, 1fr);
+			}
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-intro-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-intro-list li {
+			margin-bottom: 8px;
+			font-size: 13px;
+			color: #475569;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-intro-list code {
+			background-color: #0f172a;
+			color: #e5f2ff;
+			padding: 3px 6px;
+			border-radius: 4px;
+			font-size: 12px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-intro-tag {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 12px;
+			color: #0f172a;
+			background-color: #e0f2fe;
+			padding: 4px 9px;
+			border-radius: 999px;
+			margin-right: 6px;
+			margin-bottom: 6px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-intro-tag span {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-tag-dot {
+			width: 6px;
+			height: 6px;
+			border-radius: 999px;
+			background-color: #0284c7;
+		}
+
+		.tcmb-doviz-kuru-admin .form-table {
+			margin-top: 6px;
+		}
+
+		.tcmb-doviz-kuru-admin .form-table th {
+			padding: 10px 10px 10px 0;
+			width: 260px;
+		}
+
+		.tcmb-doviz-kuru-admin .form-table td {
+			padding: 10px 0 10px 4px;
+		}
+
+		.tcmb-doviz-kuru-admin .form-table tr:nth-child(odd) td,
+		.tcmb-doviz-kuru-admin .form-table tr:nth-child(odd) th {
+			background-color: #f8fafc;
+		}
+
+		.tcmb-doviz-kuru-admin .form-table input[type="number"],
+		.tcmb-doviz-kuru-admin .form-table input[type="text"],
+		.tcmb-doviz-kuru-admin .form-table select,
+		.tcmb-doviz-kuru-admin .form-table textarea {
+			max-width: 320px;
+		}
+
+		.tcmb-doviz-kuru-admin .form-table textarea {
+			width: 100%;
+			max-width: 520px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-field-helper {
+			font-size: 11px;
+			color: #64748b;
+			margin-top: 2px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-doviz-kuru-tab-content .submit {
+			margin-top: 14px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-faq h3 {
+			margin-top: 18px;
+			margin-bottom: 4px;
+			font-size: 15px;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-faq p,
+		.tcmb-doviz-kuru-admin .tcmb-faq ol {
+			font-size: 13px;
+			color: #475569;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-footer-note {
+			font-size: 12px;
+			color: #94a3b8;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-footer-note a {
+			color: #0f766e;
+			text-decoration: none;
+		}
+
+		.tcmb-doviz-kuru-admin .tcmb-footer-note a:hover {
+			color: #0ea5e9;
+			text-decoration: underline;
+		}
+	';
+
+	wp_add_inline_style( 'tcmb-doviz-kuru-admin', $css );
+}
+add_action( 'admin_enqueue_scripts', 'tcmb_doviz_kuru_admin_assets' );
 
 /**
  * Add admin menu.
@@ -672,10 +971,10 @@ function tcmb_doviz_kuru_render_admin_page() {
 	$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'intro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 	$tabs = array(
-		'intro'   => __( 'Tanıtım', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-		'settings'=> __( 'Döviz Kur Ayarları', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-		'wc'      => __( 'WooCommerce', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-		'faq'     => __( 'S.S.S.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+		'intro'    => __( 'Tanıtım', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+		'settings' => __( 'Döviz Kur Ayarları', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+		'wc'       => __( 'WooCommerce', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+		'faq'      => __( 'S.S.S.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
 	);
 
 	// Handle form submissions.
@@ -706,7 +1005,15 @@ function tcmb_doviz_kuru_render_admin_page() {
 		$tab = 'settings';
 
 		/* translators: %s: settings section name. */
-		add_settings_error( 'tcmb_doviz_kuru_messages', 'general_saved', sprintf( esc_html__( '%s ayarları kaydedildi.', TCMB_DOVIZ_KURU_TEXTDOMAIN ), esc_html__( 'Döviz Kur Ayarları', TCMB_DOVIZ_KURU_TEXTDOMAIN ) ), 'updated' );
+		add_settings_error(
+			'tcmb_doviz_kuru_messages',
+			'general_saved',
+			sprintf(
+				esc_html__( '%s ayarları kaydedildi.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				esc_html__( 'Döviz Kur Ayarları', TCMB_DOVIZ_KURU_TEXTDOMAIN )
+			),
+			'updated'
+		);
 	}
 
 	if ( isset( $_POST['tcmb_doviz_kuru_save_wc'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_wc', 'tcmb_doviz_kuru_wc_nonce' ) ) {
@@ -729,14 +1036,34 @@ function tcmb_doviz_kuru_render_admin_page() {
 		$tab = 'wc';
 
 		/* translators: %s: settings section name. */
-		add_settings_error( 'tcmb_doviz_kuru_messages', 'wc_saved', sprintf( esc_html__( '%s ayarları kaydedildi.', TCMB_DOVIZ_KURU_TEXTDOMAIN ), esc_html__( 'WooCommerce', TCMB_DOVIZ_KURU_TEXTDOMAIN ) ), 'updated' );
+		add_settings_error(
+			'tcmb_doviz_kuru_messages',
+			'wc_saved',
+			sprintf(
+				esc_html__( '%s ayarları kaydedildi.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				esc_html__( 'WooCommerce', TCMB_DOVIZ_KURU_TEXTDOMAIN )
+			),
+			'updated'
+		);
 	}
 
 	settings_errors( 'tcmb_doviz_kuru_messages' );
 
 	?>
 	<div class="wrap tcmb-doviz-kuru-admin">
-		<h1><?php esc_html_e( 'TCMB Döviz Kurları – E-Ticaret ve Elementor', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h1>
+		<div class="tcmb-doviz-kuru-header">
+			<div class="tcmb-doviz-kuru-header-main">
+				<h1><?php esc_html_e( 'TCMB Döviz Kurları – E-Ticaret ve Elementor', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h1>
+				<p class="tcmb-doviz-kuru-subtitle">
+					<?php esc_html_e( 'TCMB today.xml verisiyle WooCommerce ve Elementor için dinamik kur ayarlarını yönetin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+				</p>
+			</div>
+			<div class="tcmb-doviz-kuru-badge">
+				<span class="tcmb-pill-dot"></span>
+				<span><?php esc_html_e( 'Aktif', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+				<span>v<?php echo esc_html( TCMB_DOVIZ_KURU_VERSION ); ?></span>
+			</div>
+		</div>
 
 		<h2 class="nav-tab-wrapper">
 			<?php foreach ( $tabs as $id => $label ) : ?>
@@ -777,7 +1104,7 @@ function tcmb_doviz_kuru_render_admin_page() {
 		</div>
 
 		<hr />
-		<p>
+		<p class="tcmb-footer-note">
 			<?php
 			printf(
 				/* translators: %s: Hedef Hosting link. */
@@ -795,31 +1122,87 @@ function tcmb_doviz_kuru_render_admin_page() {
  */
 function tcmb_doviz_kuru_render_tab_intro() {
 	?>
-	<h2><?php esc_html_e( 'Tanıtım', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h2>
-	<p><?php esc_html_e( 'TCMB Döviz Kurları eklentisi, TCMB today.xml verisini kullanarak WordPress sitenizde dinamik döviz kurları göstermenizi sağlar.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+	<div class="tcmb-card">
+		<div class="tcmb-card-inner">
+			<div class="tcmb-card-header">
+				<div>
+					<div class="tcmb-card-title">
+						<?php esc_html_e( 'TCMB Döviz Kurları eklentisine hoş geldiniz', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+						<span class="tcmb-card-title-pill"><?php esc_html_e( 'Genel Bakış', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+					</div>
+					<p class="tcmb-card-description">
+						<?php esc_html_e(
+							'Bu eklenti, TCMB today.xml verisini kullanarak WordPress sitenizde güncel döviz kurları göstermenizi,
+							WooCommerce ürün fiyatlarını otomatik olarak dönüştürmenizi ve Elementor ile görsel kur bileşenleri oluşturmanızı sağlar.',
+							TCMB_DOVIZ_KURU_TEXTDOMAIN
+						); ?>
+					</p>
+				</div>
+				<div class="tcmb-card-badge">
+					<span class="tcmb-dot-green"></span>
+					<span><?php esc_html_e( 'Gerçek zamanlı kur akışı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+				</div>
+			</div>
 
-	<h3><?php esc_html_e( 'Kısa Kodlar', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<ul>
-		<li><code>[dolar-kuru]</code> – USD (Amerikan Doları)</li>
-		<li><code>[euro-kuru]</code> – EUR (Euro)</li>
-		<li><code>[sterlin-kuru]</code> – GBP (İngiliz Sterlini)</li>
-		<li><code>[yen-kuru]</code> – JPY (Japon Yeni)</li>
-		<li><code>[yuan-kuru]</code> – CNY (Çin Yuanı)</li>
-		<li><code>[dirhem-kuru]</code> – AED (BAE Dirhemi)</li>
-		<li><code>[tcmb_kur code="USD" field="ForexSelling" decimals="4" show_flag="yes" show_symbol="no" show_date="yes"]</code></li>
-		<li><code>[tcmb_kur_table code="USD,EUR,GBP,JPY,CNY,AED" field="ForexSelling" decimals="4"]</code></li>
-	</ul>
+			<div class="tcmb-doviz-kuru-intro-grid">
+				<div>
+					<h3><?php esc_html_e( 'Bu eklentiyi hangi senaryolarda kullanabilirsiniz?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+					<ul class="tcmb-intro-list">
+						<li><?php esc_html_e( 'E-ticaret sitenizde ürünleri USD, EUR vb. para biriminden fiyatlayıp mağazada TL olarak göstermek.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+						<li><?php esc_html_e( 'Fiyat tabloları, hizmet sayfaları veya blog yazıları içinde güncel döviz kuru göstermek.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+						<li><?php esc_html_e( 'Elementor ile tasarladığınız sayfalara şık ve esnek döviz bileşenleri eklemek.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+					</ul>
 
-	<h3><?php esc_html_e( 'Ortak Parametreler', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<ul>
-		<li><code>decimals</code> – Ondalık hane sayısı (varsayılan: genel ayardan)</li>
-		<li><code>show_symbol</code> – Sembol göster (yes/no)</li>
-		<li><code>show_flag</code> – Bayrak göster (yes/no)</li>
-		<li><code>show_date</code> – Tarih göster (yes/no)</li>
-	</ul>
+					<h3><?php esc_html_e( 'Hızlı Başlangıç (3 Adım)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+					<ol class="tcmb-intro-list">
+						<li>
+							<strong><?php esc_html_e( '1. Döviz Kur Ayarları', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></strong><br>
+							<span><?php esc_html_e( '“Döviz Kur Ayarları” sekmesinden varsayılan TCMB alanını (ForexSelling vb.), ondalık hane sayısını ve önbellek süresini belirleyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+						</li>
+						<li>
+							<strong><?php esc_html_e( '2. WooCommerce Entegrasyonu (isteğe bağlı)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></strong><br>
+							<span><?php esc_html_e( '“WooCommerce” sekmesinden fiyatları hangi para biriminde girdiğinizi ve mağazada hangi para birimini göstereceğinizi seçin. İsterseniz ürün başına para birimi modunu aktif edin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+						</li>
+						<li>
+							<strong><?php esc_html_e( '3. Kısa Kod veya Elementor ile ekleyin', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></strong><br>
+							<span><?php esc_html_e( 'İçerik alanlarına kısa kod ekleyin veya Elementor editöründe “TCMB Döviz Kuru” widget\'ını kullanın.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+						</li>
+					</ol>
+				</div>
 
-	<h3><?php esc_html_e( 'Elementor Widget', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Elementor editöründe “TCMB Döviz” kategorisi altında “TCMB Döviz Kuru” widget\'ını bulabilir, sürükle-bırak ile sayfanıza ekleyebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+				<div>
+					<h3><?php esc_html_e( 'Kısa Kod Örnekleri', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+					<ul class="tcmb-intro-list">
+						<li><code>[dolar-kuru]</code> – <?php esc_html_e( 'USD (Amerikan Doları)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+						<li><code>[euro-kuru]</code> – <?php esc_html_e( 'EUR (Euro)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+						<li><code>[sterlin-kuru]</code> – <?php esc_html_e( 'GBP (İngiliz Sterlini)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+						<li><code>[yen-kuru]</code> – <?php esc_html_e( 'JPY (Japon Yeni)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+						<li><code>[yuan-kuru]</code> – <?php esc_html_e( 'CNY (Çin Yuanı)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+						<li><code>[dirhem-kuru]</code> – <?php esc_html_e( 'AED (BAE Dirhemi)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+					</ul>
+
+					<h4 style="margin-top:10px;"><?php esc_html_e( 'Gelişmiş tek kur örneği', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h4>
+					<p class="tcmb-card-description">
+						<code>[tcmb_kur code="USD" field="ForexSelling" decimals="4" show_flag="yes" show_symbol="no" show_date="yes"]</code>
+					</p>
+
+					<h4 style="margin-top:10px;"><?php esc_html_e( 'Tablo halinde gösterim', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h4>
+					<p class="tcmb-card-description">
+						<code>[tcmb_kur_table code="USD,EUR,GBP,JPY,CNY,AED" field="ForexSelling" decimals="4"]</code><br>
+						<span><?php esc_html_e( 'Bu kısa kod, seçtiğiniz para birimlerini şık bir tablo halinde listeler.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+					</p>
+
+					<h3 style="margin-top:16px;"><?php esc_html_e( 'Elementor Widget', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+					<p class="tcmb-card-description">
+						<?php esc_html_e(
+							'Elementor editöründe sol panelde “TCMB Döviz” kategorisini bulun ve “TCMB Döviz Kuru” widget\'ını sürükleyip istediğiniz alana bırakın. Widget ayarlarından döviz kodu, TCMB alanı, ondalık hane, sembol, bayrak ve tarih görünümünü dilediğiniz gibi ayarlayabilirsiniz.',
+							TCMB_DOVIZ_KURU_TEXTDOMAIN
+						); ?>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
 	<?php
 }
 
@@ -829,88 +1212,116 @@ function tcmb_doviz_kuru_render_tab_intro() {
 function tcmb_doviz_kuru_render_tab_settings() {
 	$options = tcmb_doviz_kuru_get_general_options();
 	?>
-	<form method="post">
-		<?php wp_nonce_field( 'tcmb_doviz_kuru_save_general', 'tcmb_doviz_kuru_nonce' ); ?>
+	<div class="tcmb-card">
+		<div class="tcmb-card-inner">
+			<div class="tcmb-card-header">
+				<div>
+					<div class="tcmb-card-title">
+						<?php esc_html_e( 'Döviz Kur Genel Ayarları', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+						<span class="tcmb-card-title-pill"><?php esc_html_e( 'TCMB Alanı · Görünüm · Önbellek', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+					</div>
+					<p class="tcmb-card-description">
+						<?php esc_html_e( 'Buradan varsayılan TCMB alanını, ondalık hane sayısını, sembol/bayrak/tarih gösterimini ve önbellek süresini yapılandırabilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+					</p>
+				</div>
+				<div class="tcmb-card-badge">
+					<span class="tcmb-dot-green"></span>
+					<span><?php esc_html_e( 'Performans dostu önbellek', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+				</div>
+			</div>
 
-		<table class="form-table" role="presentation">
-			<tr>
-				<th scope="row">
-					<label for="field"><?php esc_html_e( 'Varsayılan TCMB Alanı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
-				</th>
-				<td>
-					<select name="field" id="field">
-						<option value="ForexSelling" <?php selected( $options['field'], 'ForexSelling' ); ?>>ForexSelling</option>
-						<option value="ForexBuying" <?php selected( $options['field'], 'ForexBuying' ); ?>>ForexBuying</option>
-						<option value="BanknoteSelling" <?php selected( $options['field'], 'BanknoteSelling' ); ?>>BanknoteSelling</option>
-						<option value="BanknoteBuying" <?php selected( $options['field'], 'BanknoteBuying' ); ?>>BanknoteBuying</option>
-					</select>
-					<p class="description"><?php esc_html_e( 'Kısa kodlarda alan belirtilmezse kullanılacak varsayılan alan.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
-				</td>
-			</tr>
+			<form method="post">
+				<?php wp_nonce_field( 'tcmb_doviz_kuru_save_general', 'tcmb_doviz_kuru_nonce' ); ?>
 
-			<tr>
-				<th scope="row">
-					<label for="decimals"><?php esc_html_e( 'Ondalık Hane Sayısı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
-				</th>
-				<td>
-					<input type="number" min="0" max="6" id="decimals" name="decimals" value="<?php echo esc_attr( (int) $options['decimals'] ); ?>" />
-					<p class="description"><?php esc_html_e( 'Varsayılan olarak kaç ondalık hane gösterileceğini belirleyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
-				</td>
-			</tr>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row">
+							<label for="field"><?php esc_html_e( 'Varsayılan TCMB Alanı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
+						</th>
+						<td>
+							<select name="field" id="field">
+								<option value="ForexSelling" <?php selected( $options['field'], 'ForexSelling' ); ?>>ForexSelling</option>
+								<option value="ForexBuying" <?php selected( $options['field'], 'ForexBuying' ); ?>>ForexBuying</option>
+								<option value="BanknoteSelling" <?php selected( $options['field'], 'BanknoteSelling' ); ?>>BanknoteSelling</option>
+								<option value="BanknoteBuying" <?php selected( $options['field'], 'BanknoteBuying' ); ?>>BanknoteBuying</option>
+							</select>
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( 'Kısa kodlarda alan belirtilmezse kullanılacak varsayılan alan.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
 
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Sembol Gösterimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
-				<td>
-					<label>
-						<input type="checkbox" name="show_symbol" value="1" <?php checked( $options['show_symbol'], 1 ); ?> />
-						<?php esc_html_e( 'Kur sembolünü (örn. $, €, £) göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
-					</label>
-				</td>
-			</tr>
+					<tr>
+						<th scope="row">
+							<label for="decimals"><?php esc_html_e( 'Ondalık Hane Sayısı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
+						</th>
+						<td>
+							<input type="number" min="0" max="6" id="decimals" name="decimals" value="<?php echo esc_attr( (int) $options['decimals'] ); ?>" />
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( 'Varsayılan olarak kaç ondalık hane gösterileceğini belirleyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
 
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Bayrak Gösterimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
-				<td>
-					<label>
-						<input type="checkbox" name="show_flag" value="1" <?php checked( $options['show_flag'], 1 ); ?> />
-						<?php esc_html_e( 'Ülke bayrağını göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
-					</label>
-				</td>
-			</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Sembol Gösterimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="show_symbol" value="1" <?php checked( $options['show_symbol'], 1 ); ?> />
+								<?php esc_html_e( 'Kur sembolünü (örn. $, €, £) göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</label>
+						</td>
+					</tr>
 
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Tarih Gösterimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
-				<td>
-					<label>
-						<input type="checkbox" name="show_date" value="1" <?php checked( $options['show_date'], 1 ); ?> />
-						<?php esc_html_e( '“TCMB, tarih” bilgisini göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
-					</label>
-				</td>
-			</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Bayrak Gösterimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="show_flag" value="1" <?php checked( $options['show_flag'], 1 ); ?> />
+								<?php esc_html_e( 'Ülke bayrağını göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</label>
+						</td>
+					</tr>
 
-			<tr>
-				<th scope="row">
-					<label for="cache_minutes"><?php esc_html_e( 'Önbellek Süresi (dakika)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
-				</th>
-				<td>
-					<input type="number" min="1" id="cache_minutes" name="cache_minutes" value="<?php echo esc_attr( (int) $options['cache_minutes'] ); ?>" />
-					<p class="description"><?php esc_html_e( 'TCMB verisi kaç dakika boyunca önbellekte tutulacak.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
-				</td>
-			</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Tarih Gösterimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="show_date" value="1" <?php checked( $options['show_date'], 1 ); ?> />
+								<?php esc_html_e( '“TCMB, tarih” bilgisini göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</label>
+						</td>
+					</tr>
 
-			<tr>
-				<th scope="row">
-					<label for="error_message"><?php esc_html_e( 'Hata Mesajı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
-				</th>
-				<td>
-					<textarea name="error_message" id="error_message" rows="3" cols="60"><?php echo esc_textarea( $options['error_message'] ); ?></textarea>
-					<p class="description"><?php esc_html_e( 'TCMB verisi alınamadığında kısa kodların göstereceği mesaj.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
-				</td>
-			</tr>
-		</table>
+					<tr>
+						<th scope="row">
+							<label for="cache_minutes"><?php esc_html_e( 'Önbellek Süresi (dakika)', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
+						</th>
+						<td>
+							<input type="number" min="1" id="cache_minutes" name="cache_minutes" value="<?php echo esc_attr( (int) $options['cache_minutes'] ); ?>" />
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( 'TCMB verisi kaç dakika boyunca önbellekte tutulacak.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
 
-		<?php submit_button( __( 'Ayarları Kaydet', TCMB_DOVIZ_KURU_TEXTDOMAIN ), 'primary', 'tcmb_doviz_kuru_save_general' ); ?>
-	</form>
+					<tr>
+						<th scope="row">
+							<label for="error_message"><?php esc_html_e( 'Hata Mesajı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
+						</th>
+						<td>
+							<textarea name="error_message" id="error_message" rows="3" cols="60"><?php echo esc_textarea( $options['error_message'] ); ?></textarea>
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( 'TCMB verisi alınamadığında kısa kodların göstereceği mesaj.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
+				</table>
+
+				<?php submit_button( __( 'Ayarları Kaydet', TCMB_DOVIZ_KURU_TEXTDOMAIN ), 'primary', 'tcmb_doviz_kuru_save_general' ); ?>
+			</form>
+		</div>
+	</div>
 	<?php
 }
 
@@ -918,7 +1329,7 @@ function tcmb_doviz_kuru_render_tab_settings() {
  * WooCommerce tab.
  */
 function tcmb_doviz_kuru_render_tab_wc() {
-	$options = tcmb_doviz_kuru_get_wc_options();
+	$options    = tcmb_doviz_kuru_get_wc_options();
 	$currencies = array(
 		'TRY' => 'TRY',
 		'USD' => 'USD',
@@ -929,83 +1340,109 @@ function tcmb_doviz_kuru_render_tab_wc() {
 		'AED' => 'AED',
 	);
 	?>
-	<form method="post">
-		<?php wp_nonce_field( 'tcmb_doviz_kuru_save_wc', 'tcmb_doviz_kuru_wc_nonce' ); ?>
-
-		<table class="form-table" role="presentation">
-			<tr>
-				<th scope="row"><?php esc_html_e( 'WooCommerce Entegrasyonu', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
-				<td>
-					<label>
-						<input type="checkbox" name="enabled" value="1" <?php checked( $options['enabled'], 1 ); ?> />
-						<?php esc_html_e( 'WooCommerce fiyatlarını TCMB kurlarına göre otomatik dönüştür', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
-					</label>
-					<p class="description"><?php esc_html_e( 'Eğer sadece kısa kodları kullanmak istiyorsanız bu seçeneği işaretlemeyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
-				</td>
-			</tr>
-
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Fiyat Giriş Modu', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
-				<td>
-					<label>
-						<input type="radio" name="mode" value="single" <?php checked( $options['mode'], 'single' ); ?> />
-						<?php esc_html_e( 'Tüm ürünler aynı para biriminde', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
-					</label><br />
-					<label>
-						<input type="radio" name="mode" value="per_product" <?php checked( $options['mode'], 'per_product' ); ?> />
-						<?php esc_html_e( 'Ürün başına para birimi seç', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
-					</label>
-					<p class="description"><?php esc_html_e( '“Ürün başına para birimi” modunda, her ürün için ürün düzenleme ekranından para birimi seçebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
-				</td>
-			</tr>
-
-			<tr>
-				<th scope="row">
-					<label for="input_currency"><?php esc_html_e( 'Fiyatları Girdiğiniz Para Birimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
-				</th>
-				<td>
-					<select name="input_currency" id="input_currency">
-						<?php foreach ( $currencies as $code => $label ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( strtoupper( $options['input_currency'] ), $code ); ?>>
-								<?php echo esc_html( $label ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description"><?php esc_html_e( 'Tek para birimi modunda tüm ürünleri bu para biriminde fiyatlandırdığınızı varsayar.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
-				</td>
-			</tr>
-
-			<tr>
-				<th scope="row">
-					<label for="store_currency"><?php esc_html_e( 'Mağazada Görüntülenen Para Birimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
-				</th>
-				<td>
-					<select name="store_currency" id="store_currency">
-						<?php foreach ( $currencies as $code => $label ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( strtoupper( $options['store_currency'] ), $code ); ?>>
-								<?php echo esc_html( $label ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description">
-						<?php esc_html_e( 'WooCommerce → Ayarlar → Genel → Para Birimi ile aynı olmasını öneririz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+	<div class="tcmb-card">
+		<div class="tcmb-card-inner">
+			<div class="tcmb-card-header">
+				<div>
+					<div class="tcmb-card-title">
+						<?php esc_html_e( 'WooCommerce Döviz Dönüşümü', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+						<span class="tcmb-card-title-pill"><?php esc_html_e( 'Fiyat Girişi · Mağaza Para Birimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+					</div>
+					<p class="tcmb-card-description">
+						<?php esc_html_e( 'WooCommerce ürün fiyatlarını TCMB kurlarına göre otomatik dönüştürmek için bu ayarları kullanın. Tek para birimi veya ürün başına para birimi modları arasında seçim yapabilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
 					</p>
-				</td>
-			</tr>
+				</div>
+				<div class="tcmb-card-badge">
+					<span class="tcmb-dot-green"></span>
+					<span><?php esc_html_e( 'WooCommerce entegrasyonu', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+				</div>
+			</div>
 
-			<tr>
-				<th scope="row"><?php esc_html_e( 'Orijinal Fiyatı Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
-				<td>
-					<label>
-						<input type="checkbox" name="show_original_price" value="1" <?php checked( $options['show_original_price'], 1 ); ?> />
-						<?php esc_html_e( 'Ürün sayfasında orijinal döviz fiyatını küçük not olarak göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
-					</label>
-				</td>
-			</tr>
-		</table>
+			<form method="post">
+				<?php wp_nonce_field( 'tcmb_doviz_kuru_save_wc', 'tcmb_doviz_kuru_wc_nonce' ); ?>
 
-		<?php submit_button( __( 'WooCommerce Ayarlarını Kaydet', TCMB_DOVIZ_KURU_TEXTDOMAIN ), 'primary', 'tcmb_doviz_kuru_save_wc' ); ?>
-	</form>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'WooCommerce Entegrasyonu', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="enabled" value="1" <?php checked( $options['enabled'], 1 ); ?> />
+								<?php esc_html_e( 'WooCommerce fiyatlarını TCMB kurlarına göre otomatik dönüştür', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</label>
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( 'Eğer sadece kısa kodları kullanmak istiyorsanız bu seçeneği işaretlemeyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Fiyat Giriş Modu', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+						<td>
+							<label>
+								<input type="radio" name="mode" value="single" <?php checked( $options['mode'], 'single' ); ?> />
+								<?php esc_html_e( 'Tüm ürünler aynı para biriminde', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</label><br />
+							<label>
+								<input type="radio" name="mode" value="per_product" <?php checked( $options['mode'], 'per_product' ); ?> />
+								<?php esc_html_e( 'Ürün başına para birimi seç', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</label>
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( '“Ürün başına para birimi” modunda, her ürün için ürün düzenleme ekranından para birimi seçebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row">
+							<label for="input_currency"><?php esc_html_e( 'Fiyatları Girdiğiniz Para Birimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
+						</th>
+						<td>
+							<select name="input_currency" id="input_currency">
+								<?php foreach ( $currencies as $code => $label ) : ?>
+									<option value="<?php echo esc_attr( $code ); ?>" <?php selected( strtoupper( $options['input_currency'] ), $code ); ?>>
+										<?php echo esc_html( $label ); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( 'Tek para birimi modunda tüm ürünleri bu para biriminde fiyatlandırdığınızı varsayar.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row">
+							<label for="store_currency"><?php esc_html_e( 'Mağazada Görüntülenen Para Birimi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></label>
+						</th>
+						<td>
+							<select name="store_currency" id="store_currency">
+								<?php foreach ( $currencies as $code => $label ) : ?>
+									<option value="<?php echo esc_attr( $code ); ?>" <?php selected( strtoupper( $options['store_currency'] ), $code ); ?>>
+										<?php echo esc_html( $label ); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<p class="description tcmb-field-helper">
+								<?php esc_html_e( 'WooCommerce → Ayarlar → Genel → Para Birimi ile aynı olmasını öneririz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</p>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Orijinal Fiyatı Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="show_original_price" value="1" <?php checked( $options['show_original_price'], 1 ); ?> />
+								<?php esc_html_e( 'Ürün sayfasında orijinal döviz fiyatını küçük not olarak göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+							</label>
+						</td>
+					</tr>
+				</table>
+
+				<?php submit_button( __( 'WooCommerce Ayarlarını Kaydet', TCMB_DOVIZ_KURU_TEXTDOMAIN ), 'primary', 'tcmb_doviz_kuru_save_wc' ); ?>
+			</form>
+		</div>
+	</div>
 	<?php
 }
 
@@ -1014,39 +1451,53 @@ function tcmb_doviz_kuru_render_tab_wc() {
  */
 function tcmb_doviz_kuru_render_tab_faq() {
 	?>
-	<h2><?php esc_html_e( 'Sıkça Sorulan Sorular', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h2>
+	<div class="tcmb-card">
+		<div class="tcmb-card-inner tcmb-faq">
+			<div class="tcmb-card-header">
+				<div>
+					<div class="tcmb-card-title">
+						<?php esc_html_e( 'Sıkça Sorulan Sorular', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+						<span class="tcmb-card-title-pill"><?php esc_html_e( 'Kur · WooCommerce · Elementor', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+					</div>
+					<p class="tcmb-card-description">
+						<?php esc_html_e( 'Eklentiyi kullanırken aklınıza gelebilecek temel soruların cevaplarını aşağıda bulabilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?>
+					</p>
+				</div>
+			</div>
 
-	<h3><?php esc_html_e( 'Bu eklenti ek bir ücretli API kullanıyor mu?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Hayır. Eklenti doğrudan TCMB\'nin resmi today.xml dosyasını HTTP isteği ile çeker. Herhangi bir API anahtarı veya üçüncü parti servis kullanılmaz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'Bu eklenti ek bir ücretli API kullanıyor mu?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Hayır. Eklenti doğrudan TCMB\'nin resmi today.xml dosyasını HTTP isteği ile çeker. Herhangi bir API anahtarı veya üçüncü parti servis kullanılmaz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'Kurlar ne sıklıkla güncellenir?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Kurlar TCMB\'den çekildikten sonra WordPress önbelleğinde (transient) tutulur. Varsayılan olarak 60 dakika, ayarlar sekmesinden bu süreyi değiştirebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'Kurlar ne sıklıkla güncellenir?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Kurlar TCMB\'den çekildikten sonra WordPress önbelleğinde (transient) tutulur. Varsayılan olarak 60 dakika, ayarlar sekmesinden bu süreyi değiştirebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'Önbelleği manuel olarak temizleyebilir miyim?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Ayarları kaydettiğinizde önbellek otomatik olarak temizlenir. Ayrıca, eklentiyi devre dışı bırakıp tekrar etkinleştirerek de önbelleği sıfırlayabilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'Önbelleği manuel olarak temizleyebilir miyim?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Ayarları kaydettiğinizde önbellek otomatik olarak temizlenir. Ayrıca, eklentiyi devre dışı bırakıp tekrar etkinleştirerek de önbelleği sıfırlayabilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'JPY gibi bazı kurlar TCMB\'de 100 birim üzerinden veriliyor. Bu sorun olur mu?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Hayır. Eklenti TCMB XML içindeki Unit alanını okuyup tüm değerleri 1 birim döviz üzerinden normalize eder. Yani JPY, CNY gibi para birimlerinde de doğru hesaplama yapılır.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'JPY gibi bazı kurlar TCMB\'de 100 birim üzerinden veriliyor. Bu sorun olur mu?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Hayır. Eklenti TCMB XML içindeki Unit alanını okuyup tüm değerleri 1 birim döviz üzerinden normalize eder. Yani JPY, CNY gibi para birimlerinde de doğru hesaplama yapılır.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'WooCommerce entegrasyonunu kullanmak zorunda mıyım?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Hayır. Eklentiyi yalnızca kısa kodlar ve Elementor widget\'ı için kullanabilirsiniz. WooCommerce entegrasyonu tamamen isteğe bağlıdır.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'WooCommerce entegrasyonunu kullanmak zorunda mıyım?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Hayır. Eklentiyi yalnızca kısa kodlar ve Elementor widget\'ı için kullanabilirsiniz. WooCommerce entegrasyonu tamamen isteğe bağlıdır.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'Tek para birimi ve ürün başına para birimi modlarının farkı nedir?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Tek para birimi modunda tüm ürün fiyatlarını aynı para biriminde (örneğin USD) girersiniz ve eklenti bunları mağaza para birimine (örneğin TRY) çevirir. Ürün başına para birimi modunda ise her ürün için ayrı para birimi seçebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'Tek para birimi ve ürün başına para birimi modlarının farkı nedir?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Tek para birimi modunda tüm ürün fiyatlarını aynı para biriminde (örneğin USD) girersiniz ve eklenti bunları mağaza para birimine (örneğin TRY) çevirir. Ürün başına para birimi modunda ise her ürün için ayrı para birimi seçebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'Mağaza para birimim ile eklentide seçtiğim mağaza para birimi aynı mı olmalı?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Önerilir. WooCommerce → Ayarlar → Genel → Para Birimi ile eklenti ayarlarında seçtiğiniz mağaza para birimini aynı tutarsanız fiyat biçimlendirme ve ödeme sayfası deneyimi daha tutarlı olur.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'Mağaza para birimim ile eklentide seçtiğim mağaza para birimi aynı mı olmalı?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Önerilir. WooCommerce → Ayarlar → Genel → Para Birimi ile eklenti ayarlarında seçtiğiniz mağaza para birimini aynı tutarsanız fiyat biçimlendirme ve ödeme sayfası deneyimi daha tutarlı olur.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'WooCommerce kullanmıyorum. Sadece kuru gösterebilir miyim?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<p><?php esc_html_e( 'Evet. WooCommerce olmadan da kısa kodları ve Elementor widget\'ını kullanarak döviz kurlarını gösterebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
+			<h3><?php esc_html_e( 'WooCommerce kullanmıyorum. Sadece kuru gösterebilir miyim?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<p><?php esc_html_e( 'Evet. WooCommerce olmadan da kısa kodları ve Elementor widget\'ını kullanarak döviz kurlarını gösterebilirsiniz.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></p>
 
-	<h3><?php esc_html_e( 'Elementor widget\'ını nasıl kullanırım?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
-	<ol>
-		<li><?php esc_html_e( 'Elementor ile bir sayfayı düzenleyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
-		<li><?php esc_html_e( 'Sol panelde “TCMB Döviz” kategorisini bulun.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
-		<li><?php esc_html_e( '“TCMB Döviz Kuru” widget\'ını sürükleyip istediğiniz alana bırakın.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
-		<li><?php esc_html_e( 'Widget ayarlarından döviz birimini, TCMB alanını, ondalık hane, sembol, bayrak ve tarih gösterimini seçin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
-	</ol>
+			<h3><?php esc_html_e( 'Elementor widget\'ını nasıl kullanırım?', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+			<ol>
+				<li><?php esc_html_e( 'Elementor ile bir sayfayı düzenleyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+				<li><?php esc_html_e( 'Sol panelde “TCMB Döviz” kategorisini bulun.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+				<li><?php esc_html_e( '“TCMB Döviz Kuru” widget\'ını sürükleyip istediğiniz alana bırakın.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+				<li><?php esc_html_e( 'Widget ayarlarından döviz birimini, TCMB alanını, ondalık hane, sembol, bayrak ve tarih gösterimini seçin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+			</ol>
+		</div>
+	</div>
 	<?php
 }
 
@@ -1055,7 +1506,7 @@ function tcmb_doviz_kuru_render_tab_faq() {
  * ----------------------------------------------------------------------- */
 
 /**
- * Register Elementor category.
+ * Elementor kategorisini ekle.
  */
 function tcmb_doviz_kuru_elementor_register_category( $elements_manager ) {
 	$elements_manager->add_category(
@@ -1066,177 +1517,244 @@ function tcmb_doviz_kuru_elementor_register_category( $elements_manager ) {
 		)
 	);
 }
-add_action( 'elementor/elements/categories_registered', 'tcmb_doviz_kuru_elementor_register_category' );
 
 /**
- * Elementor widget class.
+ * Elementor widget sınıfını tanımla.
+ * (Sadece Elementor yüklüyse ve sınıf daha önce tanımlanmadıysa)
  */
-if ( class_exists( '\Elementor\Widget_Base' ) ) {
+function tcmb_doviz_kuru_define_elementor_widget_class() {
+	// Elementor henüz yoksa sınıf tanımlama.
+	if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
+		return;
+	}
+
+	// Sınıf zaten tanımlıysa tekrar tanımlama.
+	if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
+		return;
+	}
 
 	class TCMB_Doviz_Kuru_Elementor_Widget extends \Elementor\Widget_Base {
 
-		public function get_name() {
-			return 'tcmb_doviz_kuru_widget';
+	public function get_name() {
+		return 'tcmb_doviz_kuru_widget';
+	}
+
+	public function get_title() {
+		return __( 'TCMB Döviz Kuru', TCMB_DOVIZ_KURU_TEXTDOMAIN );
+	}
+
+	public function get_icon() {
+		return 'eicon-number-field';
+	}
+
+	public function get_categories() {
+		return array( 'tcmb-doviz-kuru-category' );
+	}
+
+	protected function register_controls() {
+
+		/**
+		 * İÇERİK
+		 */
+		$this->start_controls_section(
+			'section_content',
+			array(
+				'label' => __( 'İçerik', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+			)
+		);
+
+		$this->add_control(
+			'code',
+			array(
+				'label'   => __( 'Döviz Kodu', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => 'USD',
+				'options' => array(
+					'USD' => 'USD',
+					'EUR' => 'EUR',
+					'GBP' => 'GBP',
+					'JPY' => 'JPY',
+					'CNY' => 'CNY',
+					'AED' => 'AED',
+				),
+			)
+		);
+
+		$this->add_control(
+			'field',
+			array(
+				'label'   => __( 'TCMB Alanı', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => 'ForexSelling',
+				'options' => array(
+					'ForexSelling'    => 'ForexSelling',
+					'ForexBuying'     => 'ForexBuying',
+					'BanknoteSelling' => 'BanknoteSelling',
+					'BanknoteBuying'  => 'BanknoteBuying',
+				),
+			)
+		);
+
+		$this->add_control(
+			'decimals',
+			array(
+				'label'   => __( 'Ondalık Hane', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'    => \Elementor\Controls_Manager::NUMBER,
+				'default' => '',
+				'min'     => 0,
+				'max'     => 6,
+				'description' => __( 'Boş bırakırsanız genel ayardaki ondalık hane kullanılır.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+			)
+		);
+
+		$this->add_control(
+			'show_symbol',
+			array(
+				'label'        => __( 'Sembol Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+
+		$this->add_control(
+			'show_flag',
+			array(
+				'label'        => __( 'Bayrak Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'return_value' => 'yes',
+				'default'      => '',
+			)
+		);
+
+		$this->add_control(
+			'show_date',
+			array(
+				'label'        => __( 'Tarihi Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+
+		$this->end_controls_section();
+
+		/**
+		 * STİL
+		 */
+		$this->start_controls_section(
+			'section_style',
+			array(
+				'label' => __( 'Stil', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		// Genel tipografi
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'general_typography',
+				'label'    => __( 'Genel Yazı Tipi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'selector' => '{{WRAPPER}} .tcmb-kur',
+			)
+		);
+
+		// Sadece değer için tipografi
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'value_typography',
+				'label'    => __( 'Kur Değeri Yazı Tipi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'selector' => '{{WRAPPER}} .tcmb-kur-value',
+			)
+		);
+
+		// Değer rengi
+		$this->add_control(
+			'value_color',
+			array(
+				'label'     => __( 'Değer Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .tcmb-kur-value' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		// Sembol rengi
+		$this->add_control(
+			'symbol_color',
+			array(
+				'label'     => __( 'Sembol Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .tcmb-kur-symbol' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		// Tarih rengi
+		$this->add_control(
+			'date_color',
+			array(
+				'label'     => __( 'Tarih Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .tcmb-kur-date' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	protected function render() {
+		$settings = $this->get_settings_for_display();
+
+		// Genel ayarlar – decimals’ı boş bırakırsan buradan gelecek
+		$atts = array(
+			'field'       => ! empty( $settings['field'] ) ? $settings['field'] : 'ForexSelling',
+			'show_symbol' => ! empty( $settings['show_symbol'] ) ? 'yes' : 'no',
+			'show_flag'   => ! empty( $settings['show_flag'] ) ? 'yes' : 'no',
+			'show_date'   => ! empty( $settings['show_date'] ) ? 'yes' : 'no',
+		);
+
+		// Elementor’da ondalık alanını doldurduysan onu kullan
+		if ( isset( $settings['decimals'] ) && $settings['decimals'] !== '' && $settings['decimals'] !== null ) {
+			$atts['decimals'] = (int) $settings['decimals'];
 		}
 
-		public function get_title() {
-			return __( 'TCMB Döviz Kuru', TCMB_DOVIZ_KURU_TEXTDOMAIN );
-		}
-
-		public function get_icon() {
-			return 'eicon-number-field';
-		}
-
-		public function get_categories() {
-			return array( 'tcmb-doviz-kuru-category' );
-		}
-
-		protected function register_controls() {
-
-			$this->start_controls_section(
-				'section_content',
-				array(
-					'label' => __( 'İçerik', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-				)
-			);
-
-			$this->add_control(
-				'code',
-				array(
-					'label'   => __( 'Döviz Kodu', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'default' => 'USD',
-					'options' => array(
-						'USD' => 'USD',
-						'EUR' => 'EUR',
-						'GBP' => 'GBP',
-						'JPY' => 'JPY',
-						'CNY' => 'CNY',
-						'AED' => 'AED',
-					),
-				)
-			);
-
-			$this->add_control(
-				'field',
-				array(
-					'label'   => __( 'TCMB Alanı', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'    => \Elementor\Controls_Manager::SELECT,
-					'default' => 'ForexSelling',
-					'options' => array(
-						'ForexSelling'   => 'ForexSelling',
-						'ForexBuying'    => 'ForexBuying',
-						'BanknoteSelling'=> 'BanknoteSelling',
-						'BanknoteBuying' => 'BanknoteBuying',
-					),
-				)
-			);
-
-			$this->add_control(
-				'decimals',
-				array(
-					'label'   => __( 'Ondalık Hane', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'    => \Elementor\Controls_Manager::NUMBER,
-					'default' => 2,
-					'min'     => 0,
-					'max'     => 6,
-				)
-			);
-
-			$this->add_control(
-				'show_symbol',
-				array(
-					'label'        => __( 'Sembol Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'         => \Elementor\Controls_Manager::SWITCHER,
-					'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'return_value' => 'yes',
-					'default'      => 'yes',
-				)
-			);
-
-			$this->add_control(
-				'show_flag',
-				array(
-					'label'        => __( 'Bayrak Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'         => \Elementor\Controls_Manager::SWITCHER,
-					'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'return_value' => 'yes',
-					'default'      => '',
-				)
-			);
-
-			$this->add_control(
-				'show_date',
-				array(
-					'label'        => __( 'Tarihi Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'         => \Elementor\Controls_Manager::SWITCHER,
-					'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'return_value' => 'yes',
-					'default'      => 'yes',
-				)
-			);
-
-			$this->end_controls_section();
-
-			$this->start_controls_section(
-				'section_style',
-				array(
-					'label' => __( 'Stil', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
-				)
-			);
-
-			$this->add_control(
-				'value_color',
-				array(
-					'label'     => __( 'Değer Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'      => \Elementor\Controls_Manager::COLOR,
-					'selectors' => array(
-						'{{WRAPPER}} .tcmb-kur-value' => 'color: {{VALUE}};',
-					),
-				)
-			);
-
-			$this->add_control(
-				'date_color',
-				array(
-					'label'     => __( 'Tarih Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-					'type'      => \Elementor\Controls_Manager::COLOR,
-					'selectors' => array(
-						'{{WRAPPER}} .tcmb-kur-date' => 'color: {{VALUE}};',
-					),
-				)
-			);
-
-			$this->end_controls_section();
-		}
-
-		protected function render() {
-			$settings = $this->get_settings_for_display();
-
-			$atts = array(
-				'field'       => isset( $settings['field'] ) ? $settings['field'] : 'ForexSelling',
-				'decimals'    => isset( $settings['decimals'] ) ? $settings['decimals'] : 2,
-				'show_symbol' => ! empty( $settings['show_symbol'] ) ? 'yes' : 'no',
-				'show_flag'   => ! empty( $settings['show_flag'] ) ? 'yes' : 'no',
-				'show_date'   => ! empty( $settings['show_date'] ) ? 'yes' : 'no',
-			);
-
-			echo tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		}
+		echo tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }
 
+}
+
 /**
- * Register Elementor widget.
+ * Elementor widget’ı kayıt et.
+ * (Hem widget sınıfını tanımlar, hem de kayıt eder)
  */
 function tcmb_doviz_kuru_register_elementor_widget( $widgets_manager ) {
+	// Sınıfı tanımla (gerekirse).
+	tcmb_doviz_kuru_define_elementor_widget_class();
+
+	// Sınıf gerçekten varsa kaydet.
 	if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
 		$widgets_manager->register( new \TCMB_Doviz_Kuru_Elementor_Widget() );
 	}
 }
-add_action( 'elementor/widgets/register', 'tcmb_doviz_kuru_register_elementor_widget' );
 
+/**
+ * Hook’ları DOĞRUDAN Elementor’a bağla.
+ * Eski Elementor sürümleri için de fallback ekliyoruz.
+ */
+add_action( 'elementor/elements/categories_registered', 'tcmb_doviz_kuru_elementor_register_category' );
+add_action( 'elementor/widgets/register', 'tcmb_doviz_kuru_register_elementor_widget' );
+add_action( 'elementor/widgets/widgets_registered', 'tcmb_doviz_kuru_register_elementor_widget' ); // eski sürüm uyumu
