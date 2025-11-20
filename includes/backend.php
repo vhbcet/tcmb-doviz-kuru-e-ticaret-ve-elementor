@@ -56,28 +56,37 @@ function tcmb_doviz_kuru_admin_styles( $hook ) {
                 return;
         }
 
-                wp_register_style( 'tcmb-doviz-kuru-admin', false );
-                wp_enqueue_style( 'tcmb-doviz-kuru-admin' );
-                wp_add_inline_style(
-                        'tcmb-doviz-kuru-admin',
-                        '.tcmb-doviz-kuru-admin { font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #1f2937; }'
-                        . '.tcmb-doviz-kuru-admin .nav-tab-wrapper { margin-top: 18px; }'
-                        . '.tcmb-doviz-kuru-admin .nav-tab { font-weight: 600; color: #1f2937; border-radius: 8px 8px 0 0; margin-right: 6px; background: #f1f5f9; border-color: #e2e8f0; }'
-                        . '.tcmb-doviz-kuru-admin .nav-tab-active { background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%); border-color: #93c5fd; color: #0f172a; box-shadow: 0 6px 12px rgba(15, 23, 42, 0.08); }'
+        wp_register_style( 'tcmb-doviz-kuru-admin', false );
+        wp_enqueue_style( 'tcmb-doviz-kuru-admin' );
+        wp_add_inline_style(
+                'tcmb-doviz-kuru-admin',
+                '.tcmb-doviz-kuru-admin { font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #1f2937; }'
+                . '.tcmb-doviz-kuru-admin .nav-tab-wrapper { margin-top: 18px; }'
+                . '.tcmb-doviz-kuru-admin .nav-tab { font-weight: 600; color: #1f2937; border-radius: 8px 8px 0 0; margin-right: 6px; background: #f1f5f9; border-color: #e2e8f0; }'
+                . '.tcmb-doviz-kuru-admin .nav-tab-active { background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%); border-color: #93c5fd; color: #0f172a; box-shadow: 0 6px 12px rgba(15, 23, 42, 0.08); }'
                 . '.tcmb-doviz-kuru-tab-content { display: grid; gap: 18px; margin-top: 18px; }'
                 . '.tcmb-doviz-kuru-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px 22px; box-shadow: 0 16px 32px rgba(15, 23, 42, 0.06); position: relative; overflow: hidden; }'
                 . '.tcmb-doviz-kuru-card:before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 10% 20%, rgba(59,130,246,0.08), transparent 30%), radial-gradient(circle at 90% 10%, rgba(14,165,233,0.1), transparent 25%); pointer-events: none; }'
                 . '.tcmb-doviz-kuru-card h2, .tcmb-doviz-kuru-card h3 { margin-top: 0; position: relative; }'
                 . '.tcmb-doviz-kuru-card h2 { font-size: 1.35rem; color: #0f172a; letter-spacing: -0.01em; }'
                 . '.tcmb-doviz-kuru-card h3 { color: #0ea5e9; font-size: 1.05rem; font-weight: 700; }'
-                        . '.tcmb-doviz-kuru-card p, .tcmb-doviz-kuru-card li, .tcmb-doviz-kuru-card label { font-size: 14px; line-height: 1.6; color: #334155; position: relative; }'
-                        . '.tcmb-doviz-kuru-shortcode-list { list-style: none; padding-left: 0; display: grid; gap: 10px; margin-top: 10px; }'
-                        . '.tcmb-doviz-kuru-shortcode-item { border: 1px dashed #cbd5e1; border-radius: 14px; padding: 12px 14px; background: #ffffff; box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04); }'
-                        . '.tcmb-doviz-kuru-shortcode-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }'
-                        . '.tcmb-doviz-kuru-shortcode-row .tcmb-doviz-kuru-shortcode-preview { background: #0ea5e9; color: #e0f2fe; padding: 4px 10px; border-radius: 10px; font-weight: 700; letter-spacing: 0.01em; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.2); }'
-                        . '.tcmb-doviz-kuru-shortcode-row .tcmb-doviz-kuru-shortcode-label { color: #0f172a; font-weight: 700; }'
-                        . '.tcmb-doviz-kuru-shortcode-row code { font-size: 13px; }'
-                        . '.tcmb-doviz-kuru-status-box { border-left: 4px solid #3b82f6; background: #eff6ff; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 10px 20px rgba(59,130,246,0.08); }'
+                . '.tcmb-doviz-kuru-card p, .tcmb-doviz-kuru-card li, .tcmb-doviz-kuru-card label { font-size: 14px; line-height: 1.6; color: #334155; position: relative; }'
+                . '.tcmb-doviz-kuru-shortcode-list { list-style: none; padding-left: 0; display: grid; gap: 12px; margin-top: 10px; }'
+                . '.tcmb-doviz-kuru-shortcode-item { border: 1px dashed #cbd5e1; border-radius: 14px; padding: 14px 16px; background: #ffffff; box-shadow: 0 8px 16px rgba(15, 23, 42, 0.04); }'
+                . '.tcmb-doviz-kuru-shortcode-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; align-items: start; }'
+                . '.tcmb-doviz-kuru-shortcode-usage { display: grid; gap: 6px; }'
+                . '.tcmb-doviz-kuru-shortcode-label { color: #0f172a; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }'
+                . '.tcmb-doviz-kuru-shortcode-label .tcmb-doviz-kuru-shortcode-chip { background: #e0f2fe; color: #0ea5e9; padding: 2px 8px; border-radius: 8px; font-size: 12px; font-weight: 700; }'
+                . '.tcmb-doviz-kuru-shortcode-row code { font-size: 13px; background: #0f172a; color: #e0f2fe; padding: 4px 8px; border-radius: 8px; width: fit-content; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.2); }'
+                . '.tcmb-doviz-kuru-shortcode-preview-box { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); color: #e0f2fe; border-radius: 12px; padding: 10px 12px; box-shadow: 0 10px 20px rgba(14,165,233,0.24); display: grid; gap: 4px; align-content: start; min-height: 70px; }'
+                . '.tcmb-doviz-kuru-shortcode-preview-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.88; font-weight: 700; }'
+                . '.tcmb-doviz-kuru-shortcode-preview-value { font-size: 16px; font-weight: 800; letter-spacing: 0.01em; display: inline-flex; align-items: center; gap: 8px; }'
+                . '.tcmb-doviz-kuru-shortcode-table-demo { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 10px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }'
+                . '.tcmb-doviz-kuru-shortcode-table-demo table { width: 100%; border-collapse: collapse; font-size: 13px; }'
+                . '.tcmb-doviz-kuru-shortcode-table-demo th, .tcmb-doviz-kuru-shortcode-table-demo td { padding: 6px 8px; border-bottom: 1px solid rgba(226, 232, 240, 0.18); text-align: left; }'
+                . '.tcmb-doviz-kuru-shortcode-table-demo th { color: #bae6fd; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }'
+                . '.tcmb-doviz-kuru-shortcode-table-demo tr:last-child td { border-bottom: none; }'
+                . '.tcmb-doviz-kuru-status-box { border-left: 4px solid #3b82f6; background: #eff6ff; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 10px 20px rgba(59,130,246,0.08); }'
                 . '.tcmb-doviz-kuru-status-box h3 { margin-top: 0; color: #1d4ed8; }'
                 . '.tcmb-doviz-kuru-status-box ul { margin: 0 0 12px 18px; }'
                 . '.tcmb-doviz-kuru-admin .form-table { margin-top: 6px; background: rgba(255,255,255,0.82); border-radius: 12px; padding: 8px 12px; border: 1px solid #e2e8f0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }'
@@ -237,56 +246,113 @@ function tcmb_doviz_kuru_render_tab_intro() {
                 <ul class="tcmb-doviz-kuru-shortcode-list">
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[dolar-kuru]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-label">USD (Amerikan Doları)</span>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview">27,85 ₺</span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">USD</span> <?php esc_html_e( 'Amerikan Doları', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <code>[dolar-kuru]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-value">27,85 ₺</span>
+                                        </div>
                                 </div>
                         </li>
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[euro-kuru]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-label">EUR (Euro)</span>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview">29,45 ₺</span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">EUR</span> Euro</span>
+                                                <code>[euro-kuru]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-value">29,45 ₺</span>
+                                        </div>
                                 </div>
                         </li>
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[sterlin-kuru]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-label">GBP (İngiliz Sterlini)</span>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview">34,10 ₺</span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">GBP</span> <?php esc_html_e( 'İngiliz Sterlini', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <code>[sterlin-kuru]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-value">34,10 ₺</span>
+                                        </div>
                                 </div>
                         </li>
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[yen-kuru]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-label">JPY (Japon Yeni)</span>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview">0,18 ₺</span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">JPY</span> <?php esc_html_e( 'Japon Yeni', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <code>[yen-kuru]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-value">0,18 ₺</span>
+                                        </div>
                                 </div>
                         </li>
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[yuan-kuru]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-label">CNY (Çin Yuanı)</span>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview">3,90 ₺</span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">CNY</span> <?php esc_html_e( 'Çin Yuanı', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <code>[yuan-kuru]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-value">3,90 ₺</span>
+                                        </div>
                                 </div>
                         </li>
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[dirhem-kuru]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-label">AED (BAE Dirhemi)</span>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview">7,55 ₺</span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">AED</span> <?php esc_html_e( 'BAE Dirhemi', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <code>[dirhem-kuru]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-value">7,55 ₺</span>
+                                        </div>
                                 </div>
                         </li>
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[tcmb_kur code="USD" field="ForexSelling" decimals="4" show_flag="yes" show_symbol="no" show_date="yes"]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview">USD 🇺🇸 27,8543 · 13.08.2023</span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">USD</span> <?php esc_html_e( 'Özel parametrelerle tek kur', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <code>[tcmb_kur code="USD" field="ForexSelling" decimals="4" show_flag="yes" show_symbol="no" show_date="yes"]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-value">🇺🇸 USD 27,8543 · 13.08.2023</span>
+                                        </div>
                                 </div>
                         </li>
                         <li class="tcmb-doviz-kuru-shortcode-item">
                                 <div class="tcmb-doviz-kuru-shortcode-row">
-                                        <code>[tcmb_kur_table code="USD,EUR,GBP,JPY,CNY,AED" field="ForexSelling" decimals="4"]</code>
-                                        <span class="tcmb-doviz-kuru-shortcode-preview"><?php esc_html_e( 'Tablo: USD / EUR / GBP / JPY / CNY / AED', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                        <div class="tcmb-doviz-kuru-shortcode-usage">
+                                                <span class="tcmb-doviz-kuru-shortcode-label"><span class="tcmb-doviz-kuru-shortcode-chip">TABLE</span> <?php esc_html_e( 'Birden fazla kur tablosu', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <code>[tcmb_kur_table code="USD,EUR,GBP,JPY,CNY,AED" field="ForexSelling" decimals="4"]</code>
+                                        </div>
+                                        <div class="tcmb-doviz-kuru-shortcode-preview-box">
+                                                <span class="tcmb-doviz-kuru-shortcode-preview-title"><?php esc_html_e( 'Önizleme', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></span>
+                                                <div class="tcmb-doviz-kuru-shortcode-table-demo">
+                                                        <table>
+                                                                <thead>
+                                                                        <tr>
+                                                                                <th>Kod</th>
+                                                                                <th><?php esc_html_e( 'Alış', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+                                                                                <th><?php esc_html_e( 'Satış', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+                                                                        </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                        <tr><td>USD</td><td>27,8123</td><td>27,8543</td></tr>
+                                                                        <tr><td>EUR</td><td>29,4021</td><td>29,4512</td></tr>
+                                                                        <tr><td>GBP</td><td>34,0511</td><td>34,1022</td></tr>
+                                                                </tbody>
+                                                        </table>
+                                                </div>
+                                        </div>
                                 </div>
                         </li>
                 </ul>
