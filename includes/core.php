@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'TCMB_DOVIZ_KURU_OPTION_GENERAL', 'tcmb_doviz_kuru_general_options' );
 define( 'TCMB_DOVIZ_KURU_OPTION_WC', 'tcmb_doviz_kuru_wc_options' );
+define( 'TCMB_DOVIZ_KURU_OPTION_STATUS', 'tcmb_doviz_kuru_status' );
 
 tcmb_doviz_kuru_load_textdomain();
 add_action( 'plugins_loaded', 'tcmb_doviz_kuru_load_textdomain' );
@@ -94,17 +95,35 @@ function tcmb_doviz_kuru_get_rates() {
         );
 
         if ( is_wp_error( $response ) ) {
+                tcmb_doviz_kuru_update_status(
+                        array(
+                                'last_error'   => $response->get_error_message(),
+                                'last_updated' => current_time( 'mysql' ),
+                        )
+                );
                 return array();
         }
 
         $status_code = wp_remote_retrieve_response_code( $response );
         if ( 200 !== $status_code ) {
+                tcmb_doviz_kuru_update_status(
+                        array(
+                                'last_error'   => sprintf( 'HTTP %d', $status_code ),
+                                'last_updated' => current_time( 'mysql' ),
+                        )
+                );
                 return array();
         }
 
         $body = wp_remote_retrieve_body( $response );
 
         if ( empty( $body ) ) {
+                tcmb_doviz_kuru_update_status(
+                        array(
+                                'last_error'   => 'Empty response body',
+                                'last_updated' => current_time( 'mysql' ),
+                        )
+                );
                 return array();
         }
 
@@ -114,6 +133,12 @@ function tcmb_doviz_kuru_get_rates() {
         libxml_use_internal_errors( $previous_internal_errors );
 
         if ( ! $xml ) {
+                tcmb_doviz_kuru_update_status(
+                        array(
+                                'last_error'   => 'Invalid XML',
+                                'last_updated' => current_time( 'mysql' ),
+                        )
+                );
                 return array();
         }
 
@@ -163,6 +188,14 @@ function tcmb_doviz_kuru_get_rates() {
 
         $cache_minutes = max( 1, (int) $general['cache_minutes'] );
         set_transient( $cache_key, $rates, $cache_minutes * MINUTE_IN_SECONDS );
+
+        tcmb_doviz_kuru_update_status(
+                array(
+                        'last_error'   => '',
+                        'last_updated' => current_time( 'mysql' ),
+                        'last_date'    => $date,
+                )
+        );
 
         return $rates;
 }
@@ -251,4 +284,23 @@ if ( ! function_exists( 'tcmb_doviz_kuru_is_wc_active' ) ) {
         function tcmb_doviz_kuru_is_wc_active() {
                 return class_exists( 'WooCommerce' );
         }
+}
+
+function tcmb_doviz_kuru_get_status() {
+        $defaults = array(
+                'last_updated' => '',
+                'last_error'   => '',
+                'last_date'    => '',
+        );
+
+        $status = get_option( TCMB_DOVIZ_KURU_OPTION_STATUS, array() );
+
+        return wp_parse_args( $status, $defaults );
+}
+
+function tcmb_doviz_kuru_update_status( $status ) {
+        $current = tcmb_doviz_kuru_get_status();
+        $merged  = array_merge( $current, $status );
+
+        update_option( TCMB_DOVIZ_KURU_OPTION_STATUS, $merged );
 }

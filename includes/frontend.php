@@ -429,6 +429,17 @@ if ( class_exists( '\\Elementor\\Widget_Base' ) ) {
         }
 }
 
+function tcmb_doviz_kuru_register_elementor_category( $elements_manager ) {
+        $elements_manager->add_category(
+                'tcmb-doviz-kuru',
+                array(
+                        'title' => __( 'TCMB Döviz', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+                        'icon'  => 'fa fa-money',
+                )
+        );
+}
+add_action( 'elementor/elements/categories_registered', 'tcmb_doviz_kuru_register_elementor_category' );
+
 function tcmb_doviz_kuru_register_elementor_widget( $widgets_manager ) {
         if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
                 $widgets_manager->register( new \TCMB_Doviz_Kuru_Elementor_Widget() );

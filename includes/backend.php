@@ -65,6 +65,19 @@ function tcmb_doviz_kuru_render_admin_page() {
                 'faq'     => __( 'S.S.S.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
         );
 
+        if ( isset( $_POST['tcmb_doviz_kuru_clear_cache'] ) && check_admin_referer( 'tcmb_doviz_kuru_clear_cache', 'tcmb_doviz_kuru_clear_nonce' ) ) {
+                delete_transient( 'tcmb_doviz_kuru_cache' );
+                tcmb_doviz_kuru_update_status(
+                        array(
+                                'last_error'   => '',
+                                'last_updated' => current_time( 'mysql' ),
+                        )
+                );
+                tcmb_doviz_kuru_get_rates();
+
+                add_settings_error( 'tcmb_doviz_kuru_messages', 'cache_cleared', __( 'Kur önbelleği temizlendi ve yenilendi.', TCMB_DOVIZ_KURU_TEXTDOMAIN ), 'updated' );
+        }
+
         if ( isset( $_POST['tcmb_doviz_kuru_save_general'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_general', 'tcmb_doviz_kuru_nonce' ) ) {
                 $field         = isset( $_POST['field'] ) ? sanitize_text_field( wp_unslash( $_POST['field'] ) ) : 'ForexSelling';
                 $decimals      = isset( $_POST['decimals'] ) ? (int) $_POST['decimals'] : 2;
@@ -205,7 +218,22 @@ function tcmb_doviz_kuru_render_tab_intro() {
 
 function tcmb_doviz_kuru_render_tab_settings() {
         $options = tcmb_doviz_kuru_get_general_options();
+        $status  = tcmb_doviz_kuru_get_status();
         ?>
+        <div class="tcmb-doviz-kuru-status-box">
+                <h3><?php esc_html_e( 'Son TCMB Durumu', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h3>
+                <ul>
+                        <li><strong><?php esc_html_e( 'Son TCMB tarihi:', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></strong> <?php echo esc_html( $status['last_date'] ? $status['last_date'] : __( 'Bilinmiyor', TCMB_DOVIZ_KURU_TEXTDOMAIN ) ); ?></li>
+                        <li><strong><?php esc_html_e( 'Son güncelleme zamanı:', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></strong> <?php echo esc_html( $status['last_updated'] ? $status['last_updated'] : __( 'Bilinmiyor', TCMB_DOVIZ_KURU_TEXTDOMAIN ) ); ?></li>
+                        <li><strong><?php esc_html_e( 'Son hata mesajı:', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></strong> <?php echo $status['last_error'] ? esc_html( $status['last_error'] ) : esc_html__( 'Hata yok', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></li>
+                </ul>
+                <form method="post">
+                        <?php wp_nonce_field( 'tcmb_doviz_kuru_clear_cache', 'tcmb_doviz_kuru_clear_nonce' ); ?>
+                        <input type="hidden" name="tcmb_doviz_kuru_clear_cache" value="1" />
+                        <?php submit_button( __( 'Kur Önbelleğini Temizle ve Yenile', TCMB_DOVIZ_KURU_TEXTDOMAIN ), 'secondary', 'submit', false ); ?>
+                </form>
+        </div>
+
         <form method="post">
                 <?php wp_nonce_field( 'tcmb_doviz_kuru_save_general', 'tcmb_doviz_kuru_nonce' ); ?>
 
