@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: TCMB Döviz Kuru – E-Ticaret ve Elementor
+ * Plugin URI:  https://github.com/vhbcet/tcmb-doviz-kuru-e-ticaret-ve-elementor
  * Description: TCMB today.xml verisini kullanarak USD, EUR, GBP, JPY, CNY ve AED kurlarını çeker. Kısa kodlar, WooCommerce ve Elementor entegrasyonu ile e-ticaret sitelerinde dinamik kur kullanmanıza yardımcı olur.
  * Version:     2.3.1
  * Author:      Hedef Hosting
