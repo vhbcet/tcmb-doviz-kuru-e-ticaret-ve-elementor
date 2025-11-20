@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function tcmb_doviz_kuru_load_textdomain() {
         load_plugin_textdomain(
-                TCMB_DOVIZ_KURU_TEXTDOMAIN,
+                'tcmb-doviz-kuru-e-ticaret-ve-elementor',
                 false,
                 dirname( plugin_basename( TCMB_DOVIZ_KURU_PLUGIN_FILE ) ) . '/languages'
         );
@@ -26,7 +26,7 @@ function tcmb_doviz_kuru_activate() {
                 'show_flag'      => 0,
                 'show_date'      => 1,
                 'cache_minutes'  => 60,
-                'error_message'  => __( 'Şu anda döviz kuru alınamıyor. Lütfen daha sonra tekrar deneyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+                'error_message'  => __( 'Şu anda döviz kuru alınamıyor. Lütfen daha sonra tekrar deneyin.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
         );
 
         $wc_defaults = array(
@@ -57,7 +57,7 @@ function tcmb_doviz_kuru_get_general_options() {
                 'show_flag'      => 0,
                 'show_date'      => 1,
                 'cache_minutes'  => 60,
-                'error_message'  => __( 'Şu anda döviz kuru alınamıyor. Lütfen daha sonra tekrar deneyin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+                'error_message'  => __( 'Şu anda döviz kuru alınamıyor. Lütfen daha sonra tekrar deneyin.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
         );
 
         $options = get_option( TCMB_DOVIZ_KURU_OPTION_GENERAL, array() );

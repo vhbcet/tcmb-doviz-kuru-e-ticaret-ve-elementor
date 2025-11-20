@@ -52,7 +52,7 @@ function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
         $date_string = '';
         if ( $show_date && ! empty( $rates['_DATE'] ) ) {
                 /* translators: %s: Date string coming from TCMB XML (for example 18.11.2025). */
-                $date_string = sprintf( esc_html__( 'TCMB, %s', TCMB_DOVIZ_KURU_TEXTDOMAIN ), esc_html( $rates['_DATE'] ) );
+                $date_string = sprintf( esc_html__( 'TCMB, %s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ), esc_html( $rates['_DATE'] ) );
         }
 
         $output  = '<span class="tcmb-kur tcmb-kur-' . esc_attr( strtolower( $code ) ) . '">';
@@ -164,8 +164,8 @@ function tcmb_doviz_kuru_shortcode_table( $atts ) {
         <table class="tcmb-kur-table">
                 <thead>
                         <tr>
-                                <th><?php esc_html_e( 'Currency', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
-                                <th><?php esc_html_e( 'Rate', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></th>
+                                <th><?php esc_html_e( 'Currency', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ); ?></th>
+                                <th><?php esc_html_e( 'Rate', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ); ?></th>
                         </tr>
                 </thead>
                 <tbody>

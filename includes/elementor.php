@@ -14,7 +14,7 @@ function tcmb_doviz_kuru_elementor_register_category( $elements_manager ) {
 	$elements_manager->add_category(
 		'tcmb-doviz-kuru-category',
 		array(
-			'title' => __( 'TCMB Döviz', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+			'title' => __( 'TCMB Döviz', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 			'icon'  => 'fa fa-money',
 		)
 	);
@@ -42,7 +42,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 	}
 
 	public function get_title() {
-		return __( 'TCMB Döviz Kuru', TCMB_DOVIZ_KURU_TEXTDOMAIN );
+		return __( 'TCMB Döviz Kuru', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' );
 	}
 
 	public function get_icon() {
@@ -61,14 +61,14 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->start_controls_section(
 			'section_content',
 			array(
-				'label' => __( 'İçerik', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label' => __( 'İçerik', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 			)
 		);
 
 		$this->add_control(
 			'code',
 			array(
-				'label'   => __( 'Döviz Kodu', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'   => __( 'Döviz Kodu', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => 'USD',
 				'options' => array(
@@ -85,7 +85,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->add_control(
 			'field',
 			array(
-				'label'   => __( 'TCMB Alanı', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'   => __( 'TCMB Alanı', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => 'ForexSelling',
 				'options' => array(
@@ -100,22 +100,22 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->add_control(
 			'decimals',
 			array(
-				'label'   => __( 'Ondalık Hane', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'   => __( 'Ondalık Hane', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'    => \Elementor\Controls_Manager::NUMBER,
 				'default' => '',
 				'min'     => 0,
 				'max'     => 6,
-				'description' => __( 'Boş bırakırsanız genel ayardaki ondalık hane kullanılır.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'description' => __( 'Boş bırakırsanız genel ayardaki ondalık hane kullanılır.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 			)
 		);
 
 		$this->add_control(
 			'show_symbol',
 			array(
-				'label'        => __( 'Sembol Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'        => __( 'Sembol Göster', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-				'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label_on'     => __( 'Evet', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+				'label_off'    => __( 'Hayır', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'return_value' => 'yes',
 				'default'      => 'yes',
 			)
@@ -124,10 +124,10 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->add_control(
 			'show_flag',
 			array(
-				'label'        => __( 'Bayrak Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'        => __( 'Bayrak Göster', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-				'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label_on'     => __( 'Evet', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+				'label_off'    => __( 'Hayır', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'return_value' => 'yes',
 				'default'      => '',
 			)
@@ -136,10 +136,10 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->add_control(
 			'show_date',
 			array(
-				'label'        => __( 'Tarihi Göster', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'        => __( 'Tarihi Göster', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => __( 'Evet', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-				'label_off'    => __( 'Hayır', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label_on'     => __( 'Evet', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+				'label_off'    => __( 'Hayır', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'return_value' => 'yes',
 				'default'      => 'yes',
 			)
@@ -153,7 +153,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->start_controls_section(
 			'section_style',
 			array(
-				'label' => __( 'Stil', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label' => __( 'Stil', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -163,7 +163,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 			\Elementor\Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'general_typography',
-				'label'    => __( 'Genel Yazı Tipi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'    => __( 'Genel Yazı Tipi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'selector' => '{{WRAPPER}} .tcmb-kur',
 			)
 		);
@@ -173,7 +173,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 			\Elementor\Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'value_typography',
-				'label'    => __( 'Kur Değeri Yazı Tipi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'    => __( 'Kur Değeri Yazı Tipi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'selector' => '{{WRAPPER}} .tcmb-kur-value',
 			)
 		);
@@ -182,7 +182,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->add_control(
 			'value_color',
 			array(
-				'label'     => __( 'Değer Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'     => __( 'Değer Rengi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .tcmb-kur-value' => 'color: {{VALUE}};',
@@ -194,7 +194,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->add_control(
 			'symbol_color',
 			array(
-				'label'     => __( 'Sembol Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'     => __( 'Sembol Rengi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .tcmb-kur-symbol' => 'color: {{VALUE}};',
@@ -206,7 +206,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->add_control(
 			'date_color',
 			array(
-				'label'     => __( 'Tarih Rengi', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+				'label'     => __( 'Tarih Rengi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .tcmb-kur-date' => 'color: {{VALUE}};',

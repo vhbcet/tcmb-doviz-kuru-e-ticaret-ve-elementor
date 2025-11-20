@@ -32,8 +32,8 @@ function tcmb_doviz_kuru_wc_product_currency_field() {
         woocommerce_wp_select(
                 array(
                         'id'          => '_tcmb_doviz_kuru_product_currency',
-                        'label'       => esc_html__( 'Ürün Para Birimi (TCMB)', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
-                        'description' => esc_html__( 'Eğer “Ürün başına para birimi” modu aktifleştirilmişse, bu ürünün fiyatını girerken kullandığınız para birimini seçin.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+                        'label'       => esc_html__( 'Ürün Para Birimi (TCMB)', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+                        'description' => esc_html__( 'Eğer “Ürün başına para birimi” modu aktifleştirilmişse, bu ürünün fiyatını girerken kullandığınız para birimini seçin.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
                         'options'     => $currencies,
                 )
         );
@@ -134,7 +134,7 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
 
         /* translators: 1: currency code (for example USD), 2: formatted original price with symbol. */
         $label = sprintf(
-                esc_html__( 'Orijinal fiyat (%1$s): %2$s', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
+                esc_html__( 'Orijinal fiyat (%1$s): %2$s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
                 esc_html( $input_currency ),
                 wp_kses_post( $formatted )
         );
