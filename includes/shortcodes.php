@@ -3,14 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
-/**
- * Render single rate HTML.
- *
- * @param string $code Currency code.
- * @param array  $atts Shortcode attributes.
- *
- * @return string
- */
 function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
         $general = tcmb_doviz_kuru_get_general_options();
         $rates   = tcmb_doviz_kuru_get_rates();
@@ -51,7 +43,6 @@ function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
 
         $date_string = '';
         if ( $show_date && ! empty( $rates['_DATE'] ) ) {
-                /* translators: %s: Date string coming from TCMB XML (for example 18.11.2025). */
                 $date_string = sprintf( esc_html__( 'TCMB, %s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ), esc_html( $rates['_DATE'] ) );
         }
 
@@ -71,9 +62,6 @@ function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
         return $output;
 }
 
-/**
- * Shortcodes: simple aliases.
- */
 function tcmb_doviz_kuru_shortcode_usd( $atts ) {
         return tcmb_doviz_kuru_render_rate( 'USD', $atts );
 }
@@ -104,9 +92,6 @@ function tcmb_doviz_kuru_shortcode_aed( $atts ) {
 }
 add_shortcode( 'dirhem-kuru', 'tcmb_doviz_kuru_shortcode_aed' );
 
-/**
- * Generic shortcode: [tcmb_kur code="USD" field="ForexSelling" decimals="4" show_flag="yes" show_symbol="no" show_date="yes"]
- */
 function tcmb_doviz_kuru_shortcode_generic( $atts ) {
         $atts = shortcode_atts(
                 array(
@@ -125,9 +110,6 @@ function tcmb_doviz_kuru_shortcode_generic( $atts ) {
 }
 add_shortcode( 'tcmb_kur', 'tcmb_doviz_kuru_shortcode_generic' );
 
-/**
- * Table shortcode: [tcmb_kur_table code="USD,EUR,GBP,JPY,CNY,AED" field="ForexSelling" decimals="4"]
- */
 function tcmb_doviz_kuru_shortcode_table( $atts ) {
         $general = tcmb_doviz_kuru_get_general_options();
         $rates   = tcmb_doviz_kuru_get_rates();

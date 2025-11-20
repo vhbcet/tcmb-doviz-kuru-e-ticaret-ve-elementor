@@ -3,19 +3,12 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
-/* --------------------------------------------------------------------------
- * WooCommerce Integration
- * ----------------------------------------------------------------------- */
-
 if ( ! function_exists( 'tcmb_doviz_kuru_is_wc_active' ) ) {
         function tcmb_doviz_kuru_is_wc_active() {
                 return class_exists( 'WooCommerce' );
         }
 }
 
-/**
- * Add product currency field (per-product mode).
- */
 function tcmb_doviz_kuru_wc_product_currency_field() {
         $currencies = array(
                 'TRY' => 'TRY',
@@ -42,20 +35,14 @@ function tcmb_doviz_kuru_wc_product_currency_field() {
 }
 add_action( 'woocommerce_product_options_pricing', 'tcmb_doviz_kuru_wc_product_currency_field' );
 
-/**
- * Save product currency meta.
- */
 function tcmb_doviz_kuru_wc_save_product_currency( $product ) {
-        if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-                $currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) {
+                $currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) );
                 $product->update_meta_data( '_tcmb_doviz_kuru_product_currency', $currency );
         }
 }
 add_action( 'woocommerce_admin_process_product_object', 'tcmb_doviz_kuru_wc_save_product_currency' );
 
-/**
- * Filter product prices on frontend.
- */
 function tcmb_doviz_kuru_wc_filter_price( $price, $product ) {
         if ( is_admin() ) {
                 return $price;
@@ -96,9 +83,6 @@ add_filter( 'woocommerce_product_get_price', 'tcmb_doviz_kuru_wc_filter_price', 
 add_filter( 'woocommerce_product_get_regular_price', 'tcmb_doviz_kuru_wc_filter_price', 20, 2 );
 add_filter( 'woocommerce_product_get_sale_price', 'tcmb_doviz_kuru_wc_filter_price', 20, 2 );
 
-/**
- * Show original currency price on single product.
- */
 function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
         if ( is_admin() ) {
                 return $price_html;
@@ -132,7 +116,6 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
         $raw_price = (float) $raw_price;
         $formatted = wc_price( $raw_price, array( 'currency' => $input_currency ) );
 
-        /* translators: 1: currency code (for example USD), 2: formatted original price with symbol. */
         $label = sprintf(
                 esc_html__( 'Orijinal fiyat (%1$s): %2$s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
                 esc_html( $input_currency ),

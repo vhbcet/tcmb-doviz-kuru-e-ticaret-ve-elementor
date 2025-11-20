@@ -3,9 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
-/**
- * Activation: set default options.
- */
 function tcmb_doviz_kuru_activate() {
         $general_defaults = array(
                 'field'          => 'ForexSelling',
@@ -19,7 +16,7 @@ function tcmb_doviz_kuru_activate() {
 
         $wc_defaults = array(
                 'enabled'             => 0,
-                'mode'                => 'single', // single|per_product
+                'mode'                => 'single',
                 'input_currency'      => 'USD',
                 'store_currency'      => 'TRY',
                 'show_original_price' => 1,
@@ -34,9 +31,6 @@ function tcmb_doviz_kuru_activate() {
         }
 }
 
-/**
- * Get general options.
- */
 function tcmb_doviz_kuru_get_general_options() {
         $defaults = array(
                 'field'          => 'ForexSelling',
@@ -53,13 +47,10 @@ function tcmb_doviz_kuru_get_general_options() {
         return wp_parse_args( $options, $defaults );
 }
 
-/**
- * Get WooCommerce options.
- */
 function tcmb_doviz_kuru_get_wc_options() {
         $defaults = array(
                 'enabled'             => 0,
-                'mode'                => 'single', // single|per_product
+                'mode'                => 'single',
                 'input_currency'      => 'USD',
                 'store_currency'      => 'TRY',
                 'show_original_price' => 1,
@@ -70,9 +61,6 @@ function tcmb_doviz_kuru_get_wc_options() {
         return wp_parse_args( $options, $defaults );
 }
 
-/**
- * Helper: symbol and flag maps.
- */
 function tcmb_doviz_kuru_get_symbols() {
         return array(
                 'USD' => '$',

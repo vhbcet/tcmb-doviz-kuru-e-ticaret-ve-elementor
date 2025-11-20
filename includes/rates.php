@@ -3,16 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
-/**
- * Fetch and cache TCMB rates.
- *
- * Returns array like:
- * [
- *   'USD' => ['ForexSelling' => 32.50, 'ForexBuying' => 32.10, 'Unit' => 1],
- *   'EUR' => [...],
- *   '_DATE' => 'YYYY-MM-DD'
- * ]
- */
 function tcmb_doviz_kuru_get_rates() {
         $general   = tcmb_doviz_kuru_get_general_options();
         $cache_key = 'tcmb_doviz_kuru_cache';
@@ -77,7 +67,6 @@ function tcmb_doviz_kuru_get_rates() {
                                 $value = str_replace( ',', '.', $value );
                                 $float = (float) $value;
 
-                                // Normalize by unit (JPY gibi 100 birim üzerinden gelenler için).
                                 if ( $unit > 1 ) {
                                         $float = $float / $unit;
                                 }
@@ -96,14 +85,6 @@ function tcmb_doviz_kuru_get_rates() {
         return $rates;
 }
 
-/**
- * Get single rate value.
- *
- * @param string $code  Currency code (USD, EUR, GBP, JPY, CNY, AED).
- * @param string $field TCMB field (ForexSelling, ForexBuying, BanknoteSelling, BanknoteBuying).
- *
- * @return float|null
- */
 function tcmb_doviz_kuru_get_rate_value( $code, $field ) {
         $rates = tcmb_doviz_kuru_get_rates();
         if ( empty( $rates ) || empty( $rates[ $code ] ) ) {
@@ -114,7 +95,6 @@ function tcmb_doviz_kuru_get_rate_value( $code, $field ) {
                 return (float) $rates[ $code ][ $field ];
         }
 
-        // Fallback: ForexSelling.
         if ( isset( $rates[ $code ]['ForexSelling'] ) ) {
                 return (float) $rates[ $code ]['ForexSelling'];
         }
@@ -122,15 +102,6 @@ function tcmb_doviz_kuru_get_rate_value( $code, $field ) {
         return null;
 }
 
-/**
- * Convert amount between currencies using TRY as pivot.
- *
- * @param float  $amount Amount.
- * @param string $from   Currency code.
- * @param string $to     Currency code.
- *
- * @return float
- */
 function tcmb_doviz_kuru_convert_amount( $amount, $from, $to ) {
         $amount = (float) $amount;
         $from   = strtoupper( $from );
@@ -148,7 +119,6 @@ function tcmb_doviz_kuru_convert_amount( $amount, $from, $to ) {
                 return $amount;
         }
 
-        // Step 1: from -> TRY.
         if ( 'TRY' === $from ) {
                 $amount_in_try = $amount;
         } else {
@@ -159,7 +129,6 @@ function tcmb_doviz_kuru_convert_amount( $amount, $from, $to ) {
                 $amount_in_try = $amount * $from_rate;
         }
 
-        // Step 2: TRY -> to.
         if ( 'TRY' === $to ) {
                 return $amount_in_try;
         }

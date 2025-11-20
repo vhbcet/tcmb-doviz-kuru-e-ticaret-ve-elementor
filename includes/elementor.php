@@ -3,13 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
-/* --------------------------------------------------------------------------
- * Elementor Widget
- * ----------------------------------------------------------------------- */
-
-/**
- * Elementor kategorisini ekle.
- */
 function tcmb_doviz_kuru_elementor_register_category( $elements_manager ) {
 	$elements_manager->add_category(
 		'tcmb-doviz-kuru-category',
@@ -20,20 +13,14 @@ function tcmb_doviz_kuru_elementor_register_category( $elements_manager ) {
 	);
 }
 
-/**
- * Elementor widget sınıfını tanımla.
- * (Sadece Elementor yüklüyse ve sınıf daha önce tanımlanmadıysa)
- */
 function tcmb_doviz_kuru_define_elementor_widget_class() {
-	// Elementor henüz yoksa sınıf tanımlama.
-	if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
-		return;
-	}
+        if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
+                return;
+        }
 
-	// Sınıf zaten tanımlıysa tekrar tanımlama.
-	if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
-		return;
-	}
+        if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
+                return;
+        }
 
 	class TCMB_Doviz_Kuru_Elementor_Widget extends \Elementor\Widget_Base {
 
@@ -55,10 +42,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 
 	protected function register_controls() {
 
-		/**
-		 * İÇERİK
-		 */
-		$this->start_controls_section(
+                $this->start_controls_section(
 			'section_content',
 			array(
 				'label' => __( 'İçerik', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
@@ -147,10 +131,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 
 		$this->end_controls_section();
 
-		/**
-		 * STİL
-		 */
-		$this->start_controls_section(
+                $this->start_controls_section(
 			'section_style',
 			array(
 				'label' => __( 'Stil', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
@@ -158,8 +139,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 			)
 		);
 
-		// Genel tipografi
-		$this->add_group_control(
+                $this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'general_typography',
@@ -168,8 +148,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 			)
 		);
 
-		// Sadece değer için tipografi
-		$this->add_group_control(
+                $this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'value_typography',
@@ -178,8 +157,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 			)
 		);
 
-		// Değer rengi
-		$this->add_control(
+                $this->add_control(
 			'value_color',
 			array(
 				'label'     => __( 'Değer Rengi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
@@ -190,8 +168,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 			)
 		);
 
-		// Sembol rengi
-		$this->add_control(
+                $this->add_control(
 			'symbol_color',
 			array(
 				'label'     => __( 'Sembol Rengi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
@@ -202,8 +179,7 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 			)
 		);
 
-		// Tarih rengi
-		$this->add_control(
+                $this->add_control(
 			'date_color',
 			array(
 				'label'     => __( 'Tarih Rengi', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
@@ -220,43 +196,31 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 
-		// Genel ayarlar – decimals’ı boş bırakırsan buradan gelecek
-		$atts = array(
+                $atts = array(
 			'field'       => ! empty( $settings['field'] ) ? $settings['field'] : 'ForexSelling',
 			'show_symbol' => ! empty( $settings['show_symbol'] ) ? 'yes' : 'no',
 			'show_flag'   => ! empty( $settings['show_flag'] ) ? 'yes' : 'no',
 			'show_date'   => ! empty( $settings['show_date'] ) ? 'yes' : 'no',
 		);
 
-		// Elementor’da ondalık alanını doldurduysan onu kullan
-		if ( isset( $settings['decimals'] ) && $settings['decimals'] !== '' && $settings['decimals'] !== null ) {
-			$atts['decimals'] = (int) $settings['decimals'];
-		}
+                if ( isset( $settings['decimals'] ) && $settings['decimals'] !== '' && $settings['decimals'] !== null ) {
+                        $atts['decimals'] = (int) $settings['decimals'];
+                }
 
-		echo tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	}
+                echo tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts );
+        }
 }
 
 }
 
-/**
- * Elementor widget’ı kayıt et.
- * (Hem widget sınıfını tanımlar, hem de kayıt eder)
- */
 function tcmb_doviz_kuru_register_elementor_widget( $widgets_manager ) {
-	// Sınıfı tanımla (gerekirse).
-	tcmb_doviz_kuru_define_elementor_widget_class();
+        tcmb_doviz_kuru_define_elementor_widget_class();
 
-	// Sınıf gerçekten varsa kaydet.
-	if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
-		$widgets_manager->register( new \TCMB_Doviz_Kuru_Elementor_Widget() );
-	}
+        if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
+                $widgets_manager->register( new \TCMB_Doviz_Kuru_Elementor_Widget() );
+        }
 }
 
-/**
- * Hook’ları DOĞRUDAN Elementor’a bağla.
- * Eski Elementor sürümleri için de fallback ekliyoruz.
- */
 add_action( 'elementor/elements/categories_registered', 'tcmb_doviz_kuru_elementor_register_category' );
 add_action( 'elementor/widgets/register', 'tcmb_doviz_kuru_register_elementor_widget' );
-add_action( 'elementor/widgets/widgets_registered', 'tcmb_doviz_kuru_register_elementor_widget' ); // eski sürüm uyumu
+add_action( 'elementor/widgets/widgets_registered', 'tcmb_doviz_kuru_register_elementor_widget' );

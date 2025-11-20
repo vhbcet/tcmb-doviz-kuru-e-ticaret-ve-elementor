@@ -3,13 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
-/* --------------------------------------------------------------------------
- * Admin Pages (modern UI)
- * ----------------------------------------------------------------------- */
-
-/**
- * Admin CSS – sadece eklenti sayfasında.
- */
 function tcmb_doviz_kuru_admin_assets( $hook_suffix ) {
 	if ( 'toplevel_page_tcmb-doviz-kuru' !== $hook_suffix ) {
 		return;
@@ -308,9 +301,6 @@ function tcmb_doviz_kuru_admin_assets( $hook_suffix ) {
 }
 add_action( 'admin_enqueue_scripts', 'tcmb_doviz_kuru_admin_assets' );
 
-/**
- * Add admin menu.
- */
 function tcmb_doviz_kuru_admin_menu() {
 	add_menu_page(
 		__( 'TCMB Döviz Kurları', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
@@ -324,15 +314,12 @@ function tcmb_doviz_kuru_admin_menu() {
 }
 add_action( 'admin_menu', 'tcmb_doviz_kuru_admin_menu' );
 
-/**
- * Render admin page with tabs: intro, settings, woocommerce, faq.
- */
 function tcmb_doviz_kuru_render_admin_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
-	$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'intro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'intro';
 
 	$tabs = array(
 		'intro'    => __( 'Tanıtım', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
@@ -341,14 +328,13 @@ function tcmb_doviz_kuru_render_admin_page() {
 		'faq'      => __( 'S.S.S.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 	);
 
-	// Handle form submissions.
-	if ( isset( $_POST['tcmb_doviz_kuru_save_general'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_general', 'tcmb_doviz_kuru_nonce' ) ) {
-		$field         = isset( $_POST['field'] ) ? sanitize_text_field( wp_unslash( $_POST['field'] ) ) : 'ForexSelling';
-		$decimals      = isset( $_POST['decimals'] ) ? (int) $_POST['decimals'] : 2; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$show_symbol   = isset( $_POST['show_symbol'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$show_flag     = isset( $_POST['show_flag'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$show_date     = isset( $_POST['show_date'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$cache_minutes = isset( $_POST['cache_minutes'] ) ? (int) $_POST['cache_minutes'] : 60; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if ( isset( $_POST['tcmb_doviz_kuru_save_general'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_general', 'tcmb_doviz_kuru_nonce' ) ) {
+                $field         = isset( $_POST['field'] ) ? sanitize_text_field( wp_unslash( $_POST['field'] ) ) : 'ForexSelling';
+                $decimals      = isset( $_POST['decimals'] ) ? (int) $_POST['decimals'] : 2;
+                $show_symbol   = isset( $_POST['show_symbol'] ) ? 1 : 0;
+                $show_flag     = isset( $_POST['show_flag'] ) ? 1 : 0;
+                $show_date     = isset( $_POST['show_date'] ) ? 1 : 0;
+                $cache_minutes = isset( $_POST['cache_minutes'] ) ? (int) $_POST['cache_minutes'] : 60;
 		$error_message = isset( $_POST['error_message'] ) ? wp_kses_post( wp_unslash( $_POST['error_message'] ) ) : '';
 
 		$options = tcmb_doviz_kuru_get_general_options();
@@ -368,10 +354,9 @@ function tcmb_doviz_kuru_render_admin_page() {
 
 		$tab = 'settings';
 
-		/* translators: %s: settings section name. */
-		add_settings_error(
-			'tcmb_doviz_kuru_messages',
-			'general_saved',
+                add_settings_error(
+                        'tcmb_doviz_kuru_messages',
+                        'general_saved',
 			sprintf(
 				esc_html__( '%s ayarları kaydedildi.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				esc_html__( 'Döviz Kur Ayarları', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' )
@@ -380,12 +365,12 @@ function tcmb_doviz_kuru_render_admin_page() {
 		);
 	}
 
-	if ( isset( $_POST['tcmb_doviz_kuru_save_wc'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_wc', 'tcmb_doviz_kuru_wc_nonce' ) ) {
-		$enabled             = isset( $_POST['enabled'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$mode                = isset( $_POST['mode'] ) ? sanitize_text_field( wp_unslash( $_POST['mode'] ) ) : 'single';
-		$input_currency      = isset( $_POST['input_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['input_currency'] ) ) : 'USD';
-		$store_currency      = isset( $_POST['store_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['store_currency'] ) ) : 'TRY';
-		$show_original_price = isset( $_POST['show_original_price'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if ( isset( $_POST['tcmb_doviz_kuru_save_wc'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_wc', 'tcmb_doviz_kuru_wc_nonce' ) ) {
+                $enabled             = isset( $_POST['enabled'] ) ? 1 : 0;
+                $mode                = isset( $_POST['mode'] ) ? sanitize_text_field( wp_unslash( $_POST['mode'] ) ) : 'single';
+                $input_currency      = isset( $_POST['input_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['input_currency'] ) ) : 'USD';
+                $store_currency      = isset( $_POST['store_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['store_currency'] ) ) : 'TRY';
+                $show_original_price = isset( $_POST['show_original_price'] ) ? 1 : 0;
 
 		$options = tcmb_doviz_kuru_get_wc_options();
 
@@ -399,10 +384,9 @@ function tcmb_doviz_kuru_render_admin_page() {
 
 		$tab = 'wc';
 
-		/* translators: %s: settings section name. */
-		add_settings_error(
-			'tcmb_doviz_kuru_messages',
-			'wc_saved',
+                add_settings_error(
+                        'tcmb_doviz_kuru_messages',
+                        'wc_saved',
 			sprintf(
 				esc_html__( '%s ayarları kaydedildi.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
 				esc_html__( 'WooCommerce', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' )
@@ -470,20 +454,16 @@ function tcmb_doviz_kuru_render_admin_page() {
 		<hr />
 		<p class="tcmb-footer-note">
 			<?php
-			printf(
-				/* translators: %s: Hedef Hosting link. */
-				esc_html__( 'Bu eklenti %s tarafından geliştirilmiştir.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
-				'<a href="https://hedefhosting.com.tr" target="_blank" rel="noopener noreferrer">Hedef Hosting</a>'
-			);
-			?>
-		</p>
-	</div>
-	<?php
+                        printf(
+                                esc_html__( 'Bu eklenti %s tarafından geliştirilmiştir.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+                                '<a href="https://hedefhosting.com.tr" target="_blank" rel="noopener noreferrer">Hedef Hosting</a>'
+                        );
+                        ?>
+                </p>
+        </div>
+        <?php
 }
 
-/**
- * Intro tab.
- */
 function tcmb_doviz_kuru_render_tab_intro() {
 	?>
 	<div class="tcmb-card">
@@ -570,9 +550,6 @@ function tcmb_doviz_kuru_render_tab_intro() {
 	<?php
 }
 
-/**
- * Settings tab: general currency settings.
- */
 function tcmb_doviz_kuru_render_tab_settings() {
 	$options = tcmb_doviz_kuru_get_general_options();
 	?>
@@ -689,9 +666,6 @@ function tcmb_doviz_kuru_render_tab_settings() {
 	<?php
 }
 
-/**
- * WooCommerce tab.
- */
 function tcmb_doviz_kuru_render_tab_wc() {
 	$options    = tcmb_doviz_kuru_get_wc_options();
 	$currencies = array(
@@ -810,9 +784,6 @@ function tcmb_doviz_kuru_render_tab_wc() {
 	<?php
 }
 
-/**
- * FAQ tab (S.S.S.).
- */
 function tcmb_doviz_kuru_render_tab_faq() {
 	?>
 	<div class="tcmb-card">
