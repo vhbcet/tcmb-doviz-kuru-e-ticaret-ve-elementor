@@ -15,14 +15,19 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+        exit;
 }
 
 define( 'TCMB_DOVIZ_KURU_VERSION', '2.3.1' );
 define( 'TCMB_DOVIZ_KURU_TEXTDOMAIN', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' );
-define( 'TCMB_DOVIZ_KURU_OPTION_GENERAL', 'tcmb_doviz_kuru_general_options' );
-define( 'TCMB_DOVIZ_KURU_OPTION_WC', 'tcmb_doviz_kuru_wc_options' );
+define( 'TCMB_DOVIZ_KURU_BASENAME', plugin_basename( __FILE__ ) );
+define( 'TCMB_DOVIZ_KURU_PATH', plugin_dir_path( __FILE__ ) );
 
+require_once TCMB_DOVIZ_KURU_PATH . 'includes/core.php';
+require_once TCMB_DOVIZ_KURU_PATH . 'includes/frontend.php';
+require_once TCMB_DOVIZ_KURU_PATH . 'includes/backend.php';
+
+register_activation_hook( __FILE__, 'tcmb_doviz_kuru_activate' );
 
 function tcmb_doviz_kuru_load_textdomain() {
 	load_plugin_textdomain(
