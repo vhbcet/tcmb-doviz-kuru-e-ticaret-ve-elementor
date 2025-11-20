@@ -55,6 +55,8 @@ sağlayan, ücretsiz API veya anahtar gerektirmeyen bir eklentidir.
 
 Eklentinin geliştiricisi: **[Hedef Hosting](https://hedefhosting.com.tr)**
 
+Kaynak kodu ve geri bildirimler: **[GitHub deposu](https://github.com/vhbcet/tcmb-doviz-kuru-e-ticaret-ve-elementor)**
+
 ---
 
 == Installation ==
