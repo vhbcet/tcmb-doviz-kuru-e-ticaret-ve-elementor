@@ -1,0 +1,30 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="icon-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1D3557"></stop>
+      <stop offset="100%" stop-color="#457B9D"></stop>
+    </linearGradient>
+    <linearGradient id="icon-accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E63946"></stop>
+      <stop offset="100%" stop-color="#F4A261"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Arka plan -->
+  <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#icon-grad)"></rect>
+
+  <!-- Hafif arka plan grafik/ok (ortalanmış) -->
+  <path d="M8 20 L13 15 L17 19 L24 12" stroke="url(#icon-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"></path>
+  <circle cx="24" cy="12" r="1.7" fill="url(#icon-accent)"></circle>
+
+  <!-- Ortalanmış TL benzeri sembol -->
+  <g transform="translate(0,0)">
+    <!-- dikey çizgi merkezde -->
+    <path d="M16 8 V24" stroke="#F1FAEE" stroke-width="2.2" stroke-linecap="round"></path>
+    <!-- üst yatay çizgi (hafif açılı) -->
+    <path d="M12 13 H20" stroke="#F1FAEE" stroke-width="2.2" stroke-linecap="round" transform="rotate(-20 16 13)"></path>
+    <!-- alt yatay çizgi (hafif açılı) -->
+    <path d="M12 16 H20" stroke="#F1FAEE" stroke-width="2.2" stroke-linecap="round" transform="rotate(-20 16 16)"></path>
+  </g>
+</svg>
