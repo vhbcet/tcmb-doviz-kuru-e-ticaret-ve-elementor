@@ -1,4 +1,4 @@
-=== TCMB Döviz Kuru – E-Ticaret & Elementor Entegrasyonlu ===
+=== TCMB Döviz Kuru – E-Ticaret ve Elementor ===
 Contributors: hedefhosting
 Tags: tcmb, doviz, currency, exchange, exchange-rate, kur, usd, eur, gbp, jpy, cny, aed, try, woocommerce, elementor, ecommerce
 Requires at least: 5.2

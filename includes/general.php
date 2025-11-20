@@ -4,18 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Load plugin textdomain.
- */
-function tcmb_doviz_kuru_load_textdomain() {
-        load_plugin_textdomain(
-                'tcmb-doviz-kuru-e-ticaret-ve-elementor',
-                false,
-                dirname( plugin_basename( TCMB_DOVIZ_KURU_PLUGIN_FILE ) ) . '/languages'
-        );
-}
-add_action( 'plugins_loaded', 'tcmb_doviz_kuru_load_textdomain' );
-
-/**
  * Activation: set default options.
  */
 function tcmb_doviz_kuru_activate() {
