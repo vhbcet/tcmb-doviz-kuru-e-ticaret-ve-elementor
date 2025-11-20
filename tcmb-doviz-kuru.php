@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: TCMB Döviz Kuru – E-Ticaret ve Elementor
+ * Plugin URI:  https://github.com/vhbcet/tcmb-doviz-kuru-e-ticaret-ve-elementor
  * Description: TCMB today.xml verisini kullanarak USD, EUR, GBP, JPY, CNY ve AED kurlarını çeker. Kısa kodlar, WooCommerce ve Elementor entegrasyonu ile e-ticaret sitelerinde dinamik kur kullanmanıza yardımcı olur.
  * Version:     2.3.1
  * Author:      Hedef Hosting
@@ -22,9 +23,7 @@ define( 'TCMB_DOVIZ_KURU_TEXTDOMAIN', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' )
 define( 'TCMB_DOVIZ_KURU_OPTION_GENERAL', 'tcmb_doviz_kuru_general_options' );
 define( 'TCMB_DOVIZ_KURU_OPTION_WC', 'tcmb_doviz_kuru_wc_options' );
 
-/**
- * Load plugin textdomain.
- */
+
 function tcmb_doviz_kuru_load_textdomain() {
 	load_plugin_textdomain(
 		TCMB_DOVIZ_KURU_TEXTDOMAIN,
@@ -34,9 +33,7 @@ function tcmb_doviz_kuru_load_textdomain() {
 }
 add_action( 'plugins_loaded', 'tcmb_doviz_kuru_load_textdomain' );
 
-/**
- * Activation: set default options.
- */
+
 function tcmb_doviz_kuru_activate() {
 	$general_defaults = array(
 		'field'          => 'ForexSelling',
@@ -50,7 +47,7 @@ function tcmb_doviz_kuru_activate() {
 
 	$wc_defaults = array(
 		'enabled'             => 0,
-		'mode'                => 'single', // single|per_product
+		'mode'                => 'single', 
 		'input_currency'      => 'USD',
 		'store_currency'      => 'TRY',
 		'show_original_price' => 1,
@@ -66,9 +63,7 @@ function tcmb_doviz_kuru_activate() {
 }
 register_activation_hook( __FILE__, 'tcmb_doviz_kuru_activate' );
 
-/**
- * Get general options.
- */
+
 function tcmb_doviz_kuru_get_general_options() {
 	$defaults = array(
 		'field'          => 'ForexSelling',
@@ -85,13 +80,11 @@ function tcmb_doviz_kuru_get_general_options() {
 	return wp_parse_args( $options, $defaults );
 }
 
-/**
- * Get WooCommerce options.
- */
+
 function tcmb_doviz_kuru_get_wc_options() {
 	$defaults = array(
 		'enabled'             => 0,
-		'mode'                => 'single', // single|per_product
+		'mode'                => 'single', 
 		'input_currency'      => 'USD',
 		'store_currency'      => 'TRY',
 		'show_original_price' => 1,
@@ -102,16 +95,7 @@ function tcmb_doviz_kuru_get_wc_options() {
 	return wp_parse_args( $options, $defaults );
 }
 
-/**
- * Fetch and cache TCMB rates.
- *
- * Returns array like:
- * [
- *   'USD' => ['ForexSelling' => 32.50, 'ForexBuying' => 32.10, 'Unit' => 1],
- *   'EUR' => [...],
- *   '_DATE' => 'YYYY-MM-DD'
- * ]
- */
+
 function tcmb_doviz_kuru_get_rates() {
 	$general = tcmb_doviz_kuru_get_general_options();
 	$cache_key = 'tcmb_doviz_kuru_cache';
@@ -121,28 +105,37 @@ function tcmb_doviz_kuru_get_rates() {
 		return $cached;
 	}
 
-	$response = wp_remote_get(
-		'https://www.tcmb.gov.tr/kurlar/today.xml',
-		array(
-			'timeout' => 10,
-		)
-	);
+        $response = wp_safe_remote_get(
+                'https://www.tcmb.gov.tr/kurlar/today.xml',
+                array(
+                        'timeout'    => 10,
+                        'user-agent' => 'tcmb-doviz-kuru/' . TCMB_DOVIZ_KURU_VERSION,
+                )
+        );
 
-	if ( is_wp_error( $response ) ) {
-		return array();
-	}
+        if ( is_wp_error( $response ) ) {
+                return array();
+        }
 
-	$body = wp_remote_retrieve_body( $response );
+        $status_code = wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $status_code ) {
+                return array();
+        }
 
-	if ( empty( $body ) ) {
-		return array();
-	}
+        $body = wp_remote_retrieve_body( $response );
 
-	$xml = simplexml_load_string( $body );
+        if ( empty( $body ) ) {
+                return array();
+        }
 
-	if ( ! $xml ) {
-		return array();
-	}
+        $previous_internal_errors = libxml_use_internal_errors( true );
+        $xml                      = simplexml_load_string( $body, 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOWARNING );
+        libxml_clear_errors();
+        libxml_use_internal_errors( $previous_internal_errors );
+
+        if ( ! $xml ) {
+                return array();
+        }
 
 	$rates = array();
 
@@ -176,7 +169,7 @@ function tcmb_doviz_kuru_get_rates() {
 				$value = str_replace( ',', '.', $value );
 				$float = (float) $value;
 
-				// Normalize by unit (JPY gibi 100 birim üzerinden gelenler için).
+				
 				if ( $unit > 1 ) {
 					$float = $float / $unit;
 				}
@@ -195,14 +188,7 @@ function tcmb_doviz_kuru_get_rates() {
 	return $rates;
 }
 
-/**
- * Get single rate value.
- *
- * @param string $code  Currency code (USD, EUR, GBP, JPY, CNY, AED).
- * @param string $field TCMB field (ForexSelling, ForexBuying, BanknoteSelling, BanknoteBuying).
- *
- * @return float|null
- */
+
 function tcmb_doviz_kuru_get_rate_value( $code, $field ) {
 	$rates = tcmb_doviz_kuru_get_rates();
 	if ( empty( $rates ) || empty( $rates[ $code ] ) ) {
@@ -213,7 +199,7 @@ function tcmb_doviz_kuru_get_rate_value( $code, $field ) {
 		return (float) $rates[ $code ][ $field ];
 	}
 
-	// Fallback: ForexSelling.
+	
 	if ( isset( $rates[ $code ]['ForexSelling'] ) ) {
 		return (float) $rates[ $code ]['ForexSelling'];
 	}
@@ -221,9 +207,7 @@ function tcmb_doviz_kuru_get_rate_value( $code, $field ) {
 	return null;
 }
 
-/**
- * Helper: symbol and flag maps.
- */
+
 function tcmb_doviz_kuru_get_symbols() {
 	return array(
 		'USD' => '$',
@@ -248,14 +232,7 @@ function tcmb_doviz_kuru_get_flags() {
 	);
 }
 
-/**
- * Render single rate HTML.
- *
- * @param string $code Currency code.
- * @param array  $atts Shortcode attributes.
- *
- * @return string
- */
+
 function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
 	$general = tcmb_doviz_kuru_get_general_options();
 	$rates   = tcmb_doviz_kuru_get_rates();
@@ -296,7 +273,7 @@ function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
 
 	$date_string = '';
 	if ( $show_date && ! empty( $rates['_DATE'] ) ) {
-		/* translators: %s: Date string coming from TCMB XML (for example 18.11.2025). */
+		
 		$date_string = sprintf( esc_html__( 'TCMB, %s', TCMB_DOVIZ_KURU_TEXTDOMAIN ), esc_html( $rates['_DATE'] ) );
 	}
 
@@ -316,9 +293,7 @@ function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
 	return $output;
 }
 
-/**
- * Shortcodes: simple aliases.
- */
+
 function tcmb_doviz_kuru_shortcode_usd( $atts ) {
 	return tcmb_doviz_kuru_render_rate( 'USD', $atts );
 }
@@ -349,9 +324,7 @@ function tcmb_doviz_kuru_shortcode_aed( $atts ) {
 }
 add_shortcode( 'dirhem-kuru', 'tcmb_doviz_kuru_shortcode_aed' );
 
-/**
- * Generic shortcode: [tcmb_kur code="USD" field="ForexSelling" decimals="4" show_flag="yes" show_symbol="no" show_date="yes"]
- */
+
 function tcmb_doviz_kuru_shortcode_generic( $atts ) {
 	$atts = shortcode_atts(
 		array(
@@ -370,9 +343,7 @@ function tcmb_doviz_kuru_shortcode_generic( $atts ) {
 }
 add_shortcode( 'tcmb_kur', 'tcmb_doviz_kuru_shortcode_generic' );
 
-/**
- * Table shortcode: [tcmb_kur_table code="USD,EUR,GBP,JPY,CNY,AED" field="ForexSelling" decimals="4"]
- */
+
 function tcmb_doviz_kuru_shortcode_table( $atts ) {
 	$general = tcmb_doviz_kuru_get_general_options();
 	$rates   = tcmb_doviz_kuru_get_rates();
@@ -447,15 +418,7 @@ function tcmb_doviz_kuru_shortcode_table( $atts ) {
 }
 add_shortcode( 'tcmb_kur_table', 'tcmb_doviz_kuru_shortcode_table' );
 
-/**
- * Convert amount between currencies using TRY as pivot.
- *
- * @param float  $amount Amount.
- * @param string $from   Currency code.
- * @param string $to     Currency code.
- *
- * @return float
- */
+
 function tcmb_doviz_kuru_convert_amount( $amount, $from, $to ) {
 	$amount = (float) $amount;
 	$from   = strtoupper( $from );
@@ -473,7 +436,7 @@ function tcmb_doviz_kuru_convert_amount( $amount, $from, $to ) {
 		return $amount;
 	}
 
-	// Step 1: from -> TRY.
+	
 	if ( 'TRY' === $from ) {
 		$amount_in_try = $amount;
 	} else {
@@ -484,7 +447,7 @@ function tcmb_doviz_kuru_convert_amount( $amount, $from, $to ) {
 		$amount_in_try = $amount * $from_rate;
 	}
 
-	// Step 2: TRY -> to.
+	
 	if ( 'TRY' === $to ) {
 		return $amount_in_try;
 	}
@@ -497,9 +460,7 @@ function tcmb_doviz_kuru_convert_amount( $amount, $from, $to ) {
 	return $amount_in_try / $to_rate;
 }
 
-/* --------------------------------------------------------------------------
- * WooCommerce Integration
- * ----------------------------------------------------------------------- */
+
 
 if ( ! function_exists( 'tcmb_doviz_kuru_is_wc_active' ) ) {
 	function tcmb_doviz_kuru_is_wc_active() {
@@ -507,9 +468,7 @@ if ( ! function_exists( 'tcmb_doviz_kuru_is_wc_active' ) ) {
 	}
 }
 
-/**
- * Add product currency field (per-product mode).
- */
+
 function tcmb_doviz_kuru_wc_product_currency_field() {
 	$currencies = array(
 		'TRY' => 'TRY',
@@ -536,20 +495,16 @@ function tcmb_doviz_kuru_wc_product_currency_field() {
 }
 add_action( 'woocommerce_product_options_pricing', 'tcmb_doviz_kuru_wc_product_currency_field' );
 
-/**
- * Save product currency meta.
- */
+
 function tcmb_doviz_kuru_wc_save_product_currency( $product ) {
-	if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) { 
+		$currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) ); 
 		$product->update_meta_data( '_tcmb_doviz_kuru_product_currency', $currency );
 	}
 }
 add_action( 'woocommerce_admin_process_product_object', 'tcmb_doviz_kuru_wc_save_product_currency' );
 
-/**
- * Filter product prices on frontend.
- */
+
 function tcmb_doviz_kuru_wc_filter_price( $price, $product ) {
 	if ( is_admin() ) {
 		return $price;
@@ -590,9 +545,7 @@ add_filter( 'woocommerce_product_get_price', 'tcmb_doviz_kuru_wc_filter_price', 
 add_filter( 'woocommerce_product_get_regular_price', 'tcmb_doviz_kuru_wc_filter_price', 20, 2 );
 add_filter( 'woocommerce_product_get_sale_price', 'tcmb_doviz_kuru_wc_filter_price', 20, 2 );
 
-/**
- * Show original currency price on single product.
- */
+
 function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
 	if ( is_admin() ) {
 		return $price_html;
@@ -628,7 +581,7 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
 	$raw_price = (float) $raw_price;
 	$formatted = wc_price( $raw_price, array( 'currency' => $input_currency ) );
 
-	/* translators: 1: currency code (for example USD), 2: formatted original price with symbol. */
+	
 	$label = sprintf(
 		esc_html__( 'Orijinal fiyat (%1$s): %2$s', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
 		esc_html( $input_currency ),
@@ -641,13 +594,9 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
 }
 add_filter( 'woocommerce_get_price_html', 'tcmb_doviz_kuru_wc_show_original_price', 20, 2 );
 
-/* --------------------------------------------------------------------------
- * Admin Pages
- * ----------------------------------------------------------------------- */
 
-/**
- * Add admin menu.
- */
+
+
 function tcmb_doviz_kuru_admin_menu() {
 	add_menu_page(
 		__( 'TCMB Döviz Kurları', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
@@ -661,15 +610,13 @@ function tcmb_doviz_kuru_admin_menu() {
 }
 add_action( 'admin_menu', 'tcmb_doviz_kuru_admin_menu' );
 
-/**
- * Render admin page with tabs: intro, settings, woocommerce, faq.
- */
+
 function tcmb_doviz_kuru_render_admin_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
-	$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'intro'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'intro'; 
 
 	$tabs = array(
 		'intro'   => __( 'Tanıtım', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
@@ -678,14 +625,14 @@ function tcmb_doviz_kuru_render_admin_page() {
 		'faq'     => __( 'S.S.S.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
 	);
 
-	// Handle form submissions.
+	
 	if ( isset( $_POST['tcmb_doviz_kuru_save_general'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_general', 'tcmb_doviz_kuru_nonce' ) ) {
 		$field         = isset( $_POST['field'] ) ? sanitize_text_field( wp_unslash( $_POST['field'] ) ) : 'ForexSelling';
-		$decimals      = isset( $_POST['decimals'] ) ? (int) $_POST['decimals'] : 2; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$show_symbol   = isset( $_POST['show_symbol'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$show_flag     = isset( $_POST['show_flag'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$show_date     = isset( $_POST['show_date'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$cache_minutes = isset( $_POST['cache_minutes'] ) ? (int) $_POST['cache_minutes'] : 60; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$decimals      = isset( $_POST['decimals'] ) ? (int) $_POST['decimals'] : 2; 
+		$show_symbol   = isset( $_POST['show_symbol'] ) ? 1 : 0; 
+		$show_flag     = isset( $_POST['show_flag'] ) ? 1 : 0; 
+		$show_date     = isset( $_POST['show_date'] ) ? 1 : 0; 
+		$cache_minutes = isset( $_POST['cache_minutes'] ) ? (int) $_POST['cache_minutes'] : 60; 
 		$error_message = isset( $_POST['error_message'] ) ? wp_kses_post( wp_unslash( $_POST['error_message'] ) ) : '';
 
 		$options = tcmb_doviz_kuru_get_general_options();
@@ -705,16 +652,16 @@ function tcmb_doviz_kuru_render_admin_page() {
 
 		$tab = 'settings';
 
-		/* translators: %s: settings section name. */
+		
 		add_settings_error( 'tcmb_doviz_kuru_messages', 'general_saved', sprintf( esc_html__( '%s ayarları kaydedildi.', TCMB_DOVIZ_KURU_TEXTDOMAIN ), esc_html__( 'Döviz Kur Ayarları', TCMB_DOVIZ_KURU_TEXTDOMAIN ) ), 'updated' );
 	}
 
 	if ( isset( $_POST['tcmb_doviz_kuru_save_wc'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_wc', 'tcmb_doviz_kuru_wc_nonce' ) ) {
-		$enabled             = isset( $_POST['enabled'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$enabled             = isset( $_POST['enabled'] ) ? 1 : 0; 
 		$mode                = isset( $_POST['mode'] ) ? sanitize_text_field( wp_unslash( $_POST['mode'] ) ) : 'single';
 		$input_currency      = isset( $_POST['input_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['input_currency'] ) ) : 'USD';
 		$store_currency      = isset( $_POST['store_currency'] ) ? sanitize_text_field( wp_unslash( $_POST['store_currency'] ) ) : 'TRY';
-		$show_original_price = isset( $_POST['show_original_price'] ) ? 1 : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$show_original_price = isset( $_POST['show_original_price'] ) ? 1 : 0; 
 
 		$options = tcmb_doviz_kuru_get_wc_options();
 
@@ -728,7 +675,7 @@ function tcmb_doviz_kuru_render_admin_page() {
 
 		$tab = 'wc';
 
-		/* translators: %s: settings section name. */
+		
 		add_settings_error( 'tcmb_doviz_kuru_messages', 'wc_saved', sprintf( esc_html__( '%s ayarları kaydedildi.', TCMB_DOVIZ_KURU_TEXTDOMAIN ), esc_html__( 'WooCommerce', TCMB_DOVIZ_KURU_TEXTDOMAIN ) ), 'updated' );
 	}
 
@@ -780,7 +727,7 @@ function tcmb_doviz_kuru_render_admin_page() {
 		<p>
 			<?php
 			printf(
-				/* translators: %s: Hedef Hosting link. */
+				
 				esc_html__( 'Bu eklenti %s tarafından geliştirilmiştir.', TCMB_DOVIZ_KURU_TEXTDOMAIN ),
 				'<a href="https://hedefhosting.com.tr" target="_blank" rel="noopener noreferrer">Hedef Hosting</a>'
 			);
@@ -790,9 +737,7 @@ function tcmb_doviz_kuru_render_admin_page() {
 	<?php
 }
 
-/**
- * Intro tab.
- */
+
 function tcmb_doviz_kuru_render_tab_intro() {
 	?>
 	<h2><?php esc_html_e( 'Tanıtım', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h2>
@@ -823,9 +768,7 @@ function tcmb_doviz_kuru_render_tab_intro() {
 	<?php
 }
 
-/**
- * Settings tab: general currency settings.
- */
+
 function tcmb_doviz_kuru_render_tab_settings() {
 	$options = tcmb_doviz_kuru_get_general_options();
 	?>
@@ -914,9 +857,7 @@ function tcmb_doviz_kuru_render_tab_settings() {
 	<?php
 }
 
-/**
- * WooCommerce tab.
- */
+
 function tcmb_doviz_kuru_render_tab_wc() {
 	$options = tcmb_doviz_kuru_get_wc_options();
 	$currencies = array(
@@ -1009,9 +950,7 @@ function tcmb_doviz_kuru_render_tab_wc() {
 	<?php
 }
 
-/**
- * FAQ tab (S.S.S.).
- */
+
 function tcmb_doviz_kuru_render_tab_faq() {
 	?>
 	<h2><?php esc_html_e( 'Sıkça Sorulan Sorular', TCMB_DOVIZ_KURU_TEXTDOMAIN ); ?></h2>
@@ -1050,13 +989,9 @@ function tcmb_doviz_kuru_render_tab_faq() {
 	<?php
 }
 
-/* --------------------------------------------------------------------------
- * Elementor Widget
- * ----------------------------------------------------------------------- */
 
-/**
- * Register Elementor category.
- */
+
+
 function tcmb_doviz_kuru_elementor_register_category( $elements_manager ) {
 	$elements_manager->add_category(
 		'tcmb-doviz-kuru-category',
@@ -1068,9 +1003,7 @@ function tcmb_doviz_kuru_elementor_register_category( $elements_manager ) {
 }
 add_action( 'elementor/elements/categories_registered', 'tcmb_doviz_kuru_elementor_register_category' );
 
-/**
- * Elementor widget class.
- */
+
 if ( class_exists( '\Elementor\Widget_Base' ) ) {
 
 	class TCMB_Doviz_Kuru_Elementor_Widget extends \Elementor\Widget_Base {
@@ -1225,14 +1158,12 @@ if ( class_exists( '\Elementor\Widget_Base' ) ) {
 				'show_date'   => ! empty( $settings['show_date'] ) ? 'yes' : 'no',
 			);
 
-			echo tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts ); 
 		}
 	}
 }
 
-/**
- * Register Elementor widget.
- */
+
 function tcmb_doviz_kuru_register_elementor_widget( $widgets_manager ) {
 	if ( class_exists( 'TCMB_Doviz_Kuru_Elementor_Widget' ) ) {
 		$widgets_manager->register( new \TCMB_Doviz_Kuru_Elementor_Widget() );
