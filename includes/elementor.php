@@ -193,23 +193,23 @@ function tcmb_doviz_kuru_define_elementor_widget_class() {
 		$this->end_controls_section();
 	}
 
-	protected function render() {
-		$settings = $this->get_settings_for_display();
+		protected function render() {
+			$settings = $this->get_settings_for_display();
 
-                $atts = array(
-			'field'       => ! empty( $settings['field'] ) ? $settings['field'] : 'ForexSelling',
-			'show_symbol' => ! empty( $settings['show_symbol'] ) ? 'yes' : 'no',
-			'show_flag'   => ! empty( $settings['show_flag'] ) ? 'yes' : 'no',
-			'show_date'   => ! empty( $settings['show_date'] ) ? 'yes' : 'no',
-		);
+			$atts = array(
+				'field'       => ! empty( $settings['field'] ) ? $settings['field'] : 'ForexSelling',
+				'show_symbol' => ! empty( $settings['show_symbol'] ) ? 'yes' : 'no',
+				'show_flag'   => ! empty( $settings['show_flag'] ) ? 'yes' : 'no',
+				'show_date'   => ! empty( $settings['show_date'] ) ? 'yes' : 'no',
+			);
 
-                if ( isset( $settings['decimals'] ) && $settings['decimals'] !== '' && $settings['decimals'] !== null ) {
-                        $atts['decimals'] = (int) $settings['decimals'];
-                }
+			if ( isset( $settings['decimals'] ) && $settings['decimals'] !== '' && $settings['decimals'] !== null ) {
+				$atts['decimals'] = (int) $settings['decimals'];
+			}
 
-                echo tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts );
-        }
-}
+			echo wp_kses_post( tcmb_doviz_kuru_render_rate( strtoupper( $settings['code'] ), $atts ) );
+		}
+	}
 
 }
 

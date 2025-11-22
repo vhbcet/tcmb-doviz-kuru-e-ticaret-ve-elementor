@@ -36,10 +36,16 @@ function tcmb_doviz_kuru_wc_product_currency_field() {
 add_action( 'woocommerce_product_options_pricing', 'tcmb_doviz_kuru_wc_product_currency_field' );
 
 function tcmb_doviz_kuru_wc_save_product_currency( $product ) {
-        if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) {
-                $currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) );
-                $product->update_meta_data( '_tcmb_doviz_kuru_product_currency', $currency );
-        }
+	$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ) : '';
+
+	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'woocommerce_save_data' ) ) {
+		return;
+	}
+
+	if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) {
+		$currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) );
+		$product->update_meta_data( '_tcmb_doviz_kuru_product_currency', $currency );
+	}
 }
 add_action( 'woocommerce_admin_process_product_object', 'tcmb_doviz_kuru_wc_save_product_currency' );
 
@@ -117,6 +123,7 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
         $formatted = wc_price( $raw_price, array( 'currency' => $input_currency ) );
 
         $label = sprintf(
+                /* translators: 1: currency code, 2: price with currency. */
                 esc_html__( 'Orijinal fiyat (%1$s): %2$s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
                 esc_html( $input_currency ),
                 wp_kses_post( $formatted )
