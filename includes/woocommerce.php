@@ -36,7 +36,9 @@ function tcmb_doviz_kuru_wc_product_currency_field() {
 add_action( 'woocommerce_product_options_pricing', 'tcmb_doviz_kuru_wc_product_currency_field' );
 
 function tcmb_doviz_kuru_wc_save_product_currency( $product ) {
-	if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['woocommerce_meta_nonce'] ), 'woocommerce_save_data' ) ) {
+	$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ) : '';
+
+	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'woocommerce_save_data' ) ) {
 		return;
 	}
 
