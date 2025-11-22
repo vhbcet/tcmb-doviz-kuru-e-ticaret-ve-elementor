@@ -36,10 +36,14 @@ function tcmb_doviz_kuru_wc_product_currency_field() {
 add_action( 'woocommerce_product_options_pricing', 'tcmb_doviz_kuru_wc_product_currency_field' );
 
 function tcmb_doviz_kuru_wc_save_product_currency( $product ) {
-        if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) {
-                $currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) );
-                $product->update_meta_data( '_tcmb_doviz_kuru_product_currency', $currency );
-        }
+	if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['woocommerce_meta_nonce'] ), 'woocommerce_save_data' ) ) {
+		return;
+	}
+
+	if ( isset( $_POST['_tcmb_doviz_kuru_product_currency'] ) ) {
+		$currency = sanitize_text_field( wp_unslash( $_POST['_tcmb_doviz_kuru_product_currency'] ) );
+		$product->update_meta_data( '_tcmb_doviz_kuru_product_currency', $currency );
+	}
 }
 add_action( 'woocommerce_admin_process_product_object', 'tcmb_doviz_kuru_wc_save_product_currency' );
 

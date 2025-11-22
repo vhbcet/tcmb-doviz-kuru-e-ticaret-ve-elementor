@@ -39,14 +39,15 @@ function tcmb_doviz_kuru_render_rate( $code, $atts = array() ) {
         $show_flag   = ( 'yes' === strtolower( (string) $atts['show_flag'] ) );
         $show_date   = ( 'yes' === strtolower( (string) $atts['show_date'] ) );
 
-        $formatted_value = number_format_i18n( $value, $decimals );
+		$formatted_value = number_format_i18n( $value, $decimals );
 
-        $date_string = '';
-        if ( $show_date && ! empty( $rates['_DATE'] ) ) {
-                $date_string = sprintf( esc_html__( 'TCMB, %s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ), esc_html( $rates['_DATE'] ) );
-        }
+		$date_string = '';
+	if ( $show_date && ! empty( $rates['_DATE'] ) ) {
+			/* translators: %s: TCMB rate date. */
+			$date_string = sprintf( esc_html__( 'TCMB, %s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ), esc_html( $rates['_DATE'] ) );
+		}
 
-        $output  = '<span class="tcmb-kur tcmb-kur-' . esc_attr( strtolower( $code ) ) . '">';
+		$output  = '<span class="tcmb-kur tcmb-kur-' . esc_attr( strtolower( $code ) ) . '">';
         if ( $show_flag && $flag ) {
                 $output .= '<span class="tcmb-kur-flag" aria-hidden="true">' . esc_html( $flag ) . '</span> ';
         }

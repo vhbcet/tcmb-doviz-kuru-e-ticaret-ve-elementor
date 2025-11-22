@@ -1,6 +1,6 @@
 === TCMB Döviz Kuru – E-Ticaret ve Elementor ===
 Contributors: hedefhosting
-Tags: tcmb, doviz, currency, exchange, exchange-rate, kur, usd, eur, gbp, jpy, cny, aed, try, woocommerce, elementor, ecommerce
+Tags: tcmb, exchange-rate, currency, woocommerce, elementor
 Requires at least: 5.2
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -8,7 +8,7 @@ Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-TCMB'nin resmi today.xml verisini kullanarak USD, EUR, GBP, JPY, CNY ve AED kurlarını çeker. Kısa kodlar, WooCommerce entegrasyonu ve Elementor widget'i ile kolay kullanım.
+TCMB'nin resmi today.xml verisiyle döviz kurlarını çeker; kısa kodlar, WooCommerce entegrasyonu ve Elementor widget'i sunar.
 
 == Description ==
 
