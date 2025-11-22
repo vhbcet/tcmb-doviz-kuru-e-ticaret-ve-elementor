@@ -455,15 +455,16 @@ function tcmb_doviz_kuru_render_admin_page() {
 
 		<hr />
 		<p class="tcmb-footer-note">
-			<?php
-                        printf(
-                                esc_html__( 'Bu eklenti %s tarafından geliştirilmiştir.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
-                                '<a href="https://hedefhosting.com.tr" target="_blank" rel="noopener noreferrer">Hedef Hosting</a>'
-                        );
-                        ?>
-                </p>
-        </div>
-        <?php
+<?php
+printf(
+/* translators: %s: developer link. */
+esc_html__( 'Bu eklenti %s tarafından geliştirilmiştir.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+'<a href="https://hedefhosting.com.tr" target="_blank" rel="noopener noreferrer">Hedef Hosting</a>'
+);
+?>
+</p>
+</div>
+<?php
 }
 
 function tcmb_doviz_kuru_render_tab_intro() {
