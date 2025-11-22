@@ -117,6 +117,7 @@ function tcmb_doviz_kuru_wc_show_original_price( $price_html, $product ) {
         $formatted = wc_price( $raw_price, array( 'currency' => $input_currency ) );
 
         $label = sprintf(
+                /* translators: 1: currency code, 2: price with currency. */
                 esc_html__( 'Orijinal fiyat (%1$s): %2$s', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
                 esc_html( $input_currency ),
                 wp_kses_post( $formatted )

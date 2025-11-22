@@ -357,12 +357,13 @@ function tcmb_doviz_kuru_render_admin_page() {
                 add_settings_error(
                         'tcmb_doviz_kuru_messages',
                         'general_saved',
-			sprintf(
-				esc_html__( '%s ayarları kaydedildi.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
-				esc_html__( 'Döviz Kur Ayarları', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' )
-			),
-			'updated'
-		);
+                        sprintf(
+                                /* translators: %s: settings tab title. */
+                                esc_html__( '%s ayarları kaydedildi.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+                                esc_html__( 'Döviz Kur Ayarları', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' )
+                        ),
+                        'updated'
+                );
 	}
 
         if ( isset( $_POST['tcmb_doviz_kuru_save_wc'] ) && check_admin_referer( 'tcmb_doviz_kuru_save_wc', 'tcmb_doviz_kuru_wc_nonce' ) ) {
@@ -387,12 +388,13 @@ function tcmb_doviz_kuru_render_admin_page() {
                 add_settings_error(
                         'tcmb_doviz_kuru_messages',
                         'wc_saved',
-			sprintf(
-				esc_html__( '%s ayarları kaydedildi.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
-				esc_html__( 'WooCommerce', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' )
-			),
-			'updated'
-		);
+                        sprintf(
+                                /* translators: %s: settings tab title. */
+                                esc_html__( '%s ayarları kaydedildi.', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' ),
+                                esc_html__( 'WooCommerce', 'tcmb-doviz-kuru-e-ticaret-ve-elementor' )
+                        ),
+                        'updated'
+                );
 	}
 
 	settings_errors( 'tcmb_doviz_kuru_messages' );
